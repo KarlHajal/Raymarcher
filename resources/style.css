@@ -111,22 +111,27 @@ a {
 	margin-right: auto;
 }
 
-.scenes {
+.selector {
 	list-style: none;
 	padding: 0;
 }
 
-.scenes li {
+.selector li {
 	padding: 0.25em;
 	border-radius: 0.4em;
 }
 
-.scenes li:hover {
+.selector li:hover {
 	background:hsl(0, 0%, 30%);
 }
 
-.scenes li.selected {
+.selector li.selected {
 	border: hsl(135, 100%, 73%) 1px solid;
+}
+
+.selector.horizontal li {
+	display: inline;
+	padding: 1rem;
 }
 
 main canvas {

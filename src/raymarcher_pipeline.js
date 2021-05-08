@@ -24,6 +24,7 @@ export class Raymarcher {
 		this.scenes = scenes
 		this.scenes_by_name = Object.fromEntries(scenes.map((sc) => [sc.name, sc]))
 		this.scene_name = null
+		this.num_reflections = 2
 	}
 
 	shader_inject_defines(shader_src, code_injections) {
@@ -61,7 +62,7 @@ export class Raymarcher {
 		uniforms['light_color_ambient'] = [1.0, 1.0, 1.0]
 
 		const code_injections = {
-			'NUM_REFLECTIONS': 1,
+			'NUM_REFLECTIONS': this.num_reflections,
 		}
 
 		// Materials
@@ -243,7 +244,11 @@ export class Raymarcher {
 		return this.scenes.map((s) => s.name)
 	}
 
-	async draw_scene(scene_name) {
+	async draw_scene({scene_name, num_reflections}) {
+		if (num_reflections === undefined || num_reflections < 0) {
+			num_reflections = this.num_reflections
+		}
+
 		const scene_def = this.scenes_by_name[scene_name]
 
 		if(! scene_def) {
@@ -251,9 +256,11 @@ export class Raymarcher {
 			return 
 		}
 
-		if(scene_name != this.scene_name) {
-			const pipe = this.ray_marcher_pipeline_for_scene(scene_def)
+		if(scene_name != this.scene_name || num_reflections != this.num_reflections) {
 			this.scene_name = scene_name
+			this.num_reflections = num_reflections
+
+			const pipe = this.ray_marcher_pipeline_for_scene(scene_def)
 
 			pipe()
 

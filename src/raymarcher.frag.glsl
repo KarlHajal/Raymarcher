@@ -5,6 +5,7 @@ precision highp float;
 #define MAX_DISTANCE 100.0
 #define EPSILON 0.001
 #define MAX_RANGE 1e6
+//#define NUM_REFLECTIONS
 
 //#define NUM_SPHERES
 #if NUM_SPHERES != 0
@@ -223,22 +224,33 @@ void main() {
 	vec3 ray_origin = v2f_ray_origin;
 	vec3 ray_direction = normalize(v2f_ray_direction);
 
-	int material_id;
+	vec3 pix_color = vec3(0.);
 
-	float start = MIN_DISTANCE;
-	float end = MAX_DISTANCE;
-	float dist = shortest_distance_to_surface(ray_origin, ray_direction, start, end, material_id);
+	float product_coeff = 1.;
 
-    if (dist > end - EPSILON) { // No collision
-        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
-		return;
-    }
-	
-	Material intersected_material = get_mat2(material_id);
+	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
+		int material_id;
 
-	vec3 p = ray_origin + dist * ray_direction;
-    
-    vec3 color = phong_lighting(p, ray_origin, intersected_material);
+		float start = MIN_DISTANCE;
+		float end = MAX_DISTANCE;
+		float dist = shortest_distance_to_surface(ray_origin, ray_direction, start, end, material_id);
 
-	gl_FragColor = vec4(color, 1.);
+		if (dist > end - EPSILON) { // No collision
+			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			break;
+		}
+		
+		Material intersected_material = get_mat2(material_id);
+
+		vec3 p = ray_origin + dist * ray_direction;
+		
+		pix_color += (1. - intersected_material.mirror) * product_coeff * phong_lighting(p, ray_origin, intersected_material);
+		product_coeff *= intersected_material.mirror;
+
+		ray_origin = p;
+		ray_direction = reflect(ray_direction, estimateNormal(p)); // TODO: Fix normal
+		ray_origin += ray_direction*0.01; // To avoid acne
+	}
+
+	gl_FragColor = vec4(pix_color, 1.);
 }

@@ -1,5 +1,5 @@
 
-function scene_choser(elem, raymarcher, initial_scene) {
+function scene_chooser(elem, raymarcher, initial_scene) {
 
 	const buttons = {}
 
@@ -14,7 +14,7 @@ function scene_choser(elem, raymarcher, initial_scene) {
 
 	function set_scene(sc_name) {
 		if(sc_name != raymarcher.scene_name) {
-			raymarcher.draw_scene(sc_name)
+			raymarcher.draw_scene({scene_name: sc_name})
 			update()
 		}
 	}
@@ -47,8 +47,44 @@ function scene_choser(elem, raymarcher, initial_scene) {
 	}
 }
 
-export function init_menu(rt, initial_scene) {
-	const elem_scenes = document.querySelector('#menu .scenes')
+function reflection_chooser(elem, raymarcher) {
 
-	scene_choser(elem_scenes, rt, initial_scene)
+	const buttons = []
+
+	function update() {
+		Object.values(buttons).forEach((item) => {
+			item.classList.remove('selected')
+		})
+		buttons[raymarcher.num_reflections].classList.add('selected')
+	}
+
+	function set_num_reflections(num_reflections) {
+		if(num_reflections >= 0 && num_reflections != raymarcher.num_reflections) {
+			raymarcher.draw_scene({
+				scene_name: raymarcher.scene_name,
+				num_reflections: num_reflections,
+			})
+			update()
+		}
+	}
+
+	const available_num_reflections = [0, 1, 2, 3, 4]
+
+	available_num_reflections.forEach((nr) => {
+		const item = document.createElement('li')
+		item.textContent = nr.toFixed(0)
+		item.addEventListener('click', () => set_num_reflections(nr))
+		elem.appendChild(item)
+		buttons[nr] = item
+	})
+
+	update()
+}
+
+export function init_menu(raymarcher, initial_scene) {
+	const elem_scenes = document.querySelector('#menu-scenes')
+	scene_chooser(elem_scenes, raymarcher, initial_scene)
+
+	const elem_reflections = document.querySelector('#menu-reflections')
+	reflection_chooser(elem_reflections, raymarcher)
 }
