@@ -158,8 +158,8 @@ float sceneSDF(vec3 sample_point, out int material_id) {
     return min_distance;
 }
 
-// TODO: get better way
-vec3 estimateNormal(vec3 p) {
+/*
+vec3 estimate_normal(vec3 p) {
 	int temp_id;
     return normalize(vec3(
         sceneSDF(vec3(p.x + EPSILON, p.y, p.z), temp_id) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z), temp_id),
@@ -167,6 +167,19 @@ vec3 estimateNormal(vec3 p) {
         sceneSDF(vec3(p.x, p.y, p.z  + EPSILON), temp_id) - sceneSDF(vec3(p.x, p.y, p.z - EPSILON), temp_id)
     ));
 }
+*/
+
+vec3 estimate_normal(vec3 p ) // Tetrahedron technique
+{
+    const float h = 0.0001; // replace by an appropriate value
+    const vec2 k = vec2(1,-1);
+	int temp_id;
+    return normalize( k.xyy*sceneSDF( p + k.xyy*h, temp_id ) + 
+                      k.yyx*sceneSDF( p + k.yyx*h, temp_id ) + 
+                      k.yxy*sceneSDF( p + k.yxy*h, temp_id ) + 
+                      k.xxx*sceneSDF( p + k.xxx*h, temp_id ) );
+}
+
 
 float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, float start, float end, out int material_id) {
     float depth = start;
@@ -187,46 +200,62 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     return end;
 }
 
-vec3 phong_light_contribution(vec3 p, vec3 eye, Light light, Material material) {
-
-    vec3 N = estimateNormal(p);
+bool is_shadow(vec3 p, Light light){
     vec3 L = normalize(light.position - p);
-    vec3 V = normalize(eye - p);
-    vec3 R = normalize(reflect(-L, N));
+	vec3 displaced_origin = p + L * 0.1;
+	int temp_id;
+	float dist = shortest_distance_to_surface(displaced_origin, L, MIN_DISTANCE, MAX_DISTANCE, temp_id);
+	return dist < length(light.position - displaced_origin);
+}
+
+vec3 phong_light_contribution(vec3 p, vec3 eye, vec3 normal, Light light, Material material) {
+
+	if(is_shadow(p, light)){
+		return vec3(0.);
+	}
+
+    vec3 L = normalize(light.position - p);
+    float dotLN = dot(L, normal);
     
-    float dotLN = dot(L, N);
-    float dotRV = dot(R, V);
-    
-    if (dotLN < 0.0) {
+    if (dotLN < EPSILON) {
         return vec3(0.0, 0.0, 0.0);
     } 
     
-    if (dotRV < 0.0) {
-        return material.color * light.color * (material.diffuse * dotLN);
+    vec3 V = normalize(eye - p);
+    vec3 R = normalize(reflect(-L, normal));
+    float dotRV = dot(R, V);
+
+	vec3 color = material.color * light.color * material.diffuse * dotLN;
+
+    if (dotRV > 0.) {
+        color += material.color * light.color * material.specular * pow(dotRV, material.shininess);
     }
-    return material.color * light.color * (material.diffuse * dotLN + material.specular * pow(dotRV, material.shininess));
+
+    return color;
 }
 
-vec3 phong_lighting(vec3 p, vec3 eye, Material material) {
+float ambient_occlusion_contribution(vec3 p, vec3 normal){
+	return 0.; 
+}
+
+vec3 compute_lighting(vec3 p, vec3 eye, vec3 normal, Material material) {
     
-	vec3 ambient_contribution =  material.color*material.ambient * light_color_ambient;
+	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
     vec3 pix_color = ambient_contribution;
 
+	pix_color += ambient_contribution * ambient_occlusion_contribution(p, normal);
+
 	for(int i = 0; i < NUM_LIGHTS; i ++){
-		pix_color += phong_light_contribution(p, eye, lights[i], material);
+		pix_color += phong_light_contribution(p, eye, normal, lights[i], material);
 	}
 
 	return pix_color;
 }
 
-void main() {
-
-	vec3 ray_origin = v2f_ray_origin;
-	vec3 ray_direction = normalize(v2f_ray_direction);
-
-	vec3 pix_color = vec3(0.);
-
+vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
+	
 	float product_coeff = 1.;
+	vec3 color = vec3(0.);
 
 	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
 		int material_id;
@@ -243,14 +272,27 @@ void main() {
 		Material intersected_material = get_mat2(material_id);
 
 		vec3 p = ray_origin + dist * ray_direction;
+
+		vec3 normal = estimate_normal(p);
 		
-		pix_color += (1. - intersected_material.mirror) * product_coeff * phong_lighting(p, ray_origin, intersected_material);
+		color += (1. - intersected_material.mirror) * product_coeff * compute_lighting(p, ray_origin, normal, intersected_material);
 		product_coeff *= intersected_material.mirror;
 
 		ray_origin = p;
-		ray_direction = reflect(ray_direction, estimateNormal(p)); // TODO: Fix normal
+		ray_direction = reflect(ray_direction, normal);
 		ray_origin += ray_direction*0.01; // To avoid acne
 	}
 
+	return color;
+}
+
+void main() {
+
+	vec3 ray_origin = v2f_ray_origin;
+	vec3 ray_direction = normalize(v2f_ray_direction);
+
+	vec3 pix_color = compute_pixel_color(ray_origin, ray_direction);
+
+	
 	gl_FragColor = vec4(pix_color, 1.);
 }

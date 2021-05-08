@@ -2,22 +2,6 @@
 
 export const SCENES = [
 	{
-		name: "floor",
-		camera: {
-			position: [-2, 0, 1], target: [0, 0, 0], up: [1, 0, 0.75], fov: 75,
-		},
-		materials: [
-			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.6, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-		],
-		lights: [],
-		spheres: [],
-		planes: [
-			{center: [0.0, 0., -0.5], normal: [0, 0, 1], material: 'white'}, // floor
-		],
-		cylinders: [],
-		mesh: null,
-	},
-	{
 		name: "primitives",
 		camera: {
 			position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
@@ -107,20 +91,6 @@ export const SCENES = [
 			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
 			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
 		],
-		mesh: null,
-	},
-	{
-		name: "empty",
-		camera: {
-			position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
-		},
-		materials: [
-			{name: 'green', color: [0.3, 1., 0.4], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.},
-		],
-		lights: [],
-		spheres: [],
-		planes: [],
-		cylinders: [],
 		mesh: null,
 	}
 	]
@@ -233,7 +203,6 @@ export const SCENES = [
 			{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], material: 'pot'},
 			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
 			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
-			{center: [ 0.42, 0.425, -0.165], radius: 0.2, height: 0.5, axis: [0.8, 0.5, -0.1], material: 'metal'},
 		],
 		mesh: null,
 	})
