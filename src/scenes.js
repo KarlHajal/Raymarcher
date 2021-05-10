@@ -284,6 +284,7 @@ export const SCENES = [
 		materials: [
 			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.5, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.8, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'green', color: [0.48, 0.68, 0.28], ambient: 0.9, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 		],
 		lights: [
 			{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},
@@ -303,12 +304,20 @@ export const SCENES = [
 			{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
 			{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
 			{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-			{center: [1, 3, 1.1], radius: 0.5, material: 'white'},
+			{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
+			//{center: [-3, 0, 1.1], radius: 1.5, material: 'green'},
+			//{center: [-3, 0, 3.], radius: 1., material: 'green'},
+			//{center: [-2.5, 1, 3.5], radius: 0.2, material: 'white'},
+			//{center: [-3.1, 1, 3.5], radius: 0.2, material: 'white'},
+			//{center: [-2.8, 1, 3.2], radius: 0.1, material: 'white'},
 		],
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
 		],
 		mesh: null,
 	})
