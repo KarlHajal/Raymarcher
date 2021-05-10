@@ -282,8 +282,8 @@ export const SCENES = [
 			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 		},
 		materials: [
-			{name: 'floor', color: [0., 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
-			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.5, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.8, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 		],
 		lights: [
 			{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},

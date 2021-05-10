@@ -2,6 +2,7 @@ precision highp float;
 
 #define PI 3.14159265359
 
+#define NUM_AMBIENT_OCCLUSION_SAMPLES 32
 #define MAX_MARCHING_STEPS 255
 #define MIN_DISTANCE 0.0
 #define MAX_DISTANCE 100.0
@@ -236,15 +237,21 @@ vec3 phong_light_contribution(vec3 p, vec3 eye, vec3 normal, Light light, Materi
     return color;
 }
 
-float hash_poly(float x) {
-	return mod(((x*34.0)+1.0)*x, 289.0);
+float random(vec2 co)
+{
+    float a = 12.9898;
+    float b = 78.233;
+    float c = 43758.5453;
+    float dt= dot(co.xy ,vec2(a,b));
+    float sn= mod(dt,3.14);
+    return fract(sin(sn) * c);
 }
 
 vec3 get_random_hemisphere_ray_direction(vec3 normal, float seed){
 	// Radians [0, 2*PI]
-	float r1 = 2. * PI * hash_poly(seed*2.);
+	float r1 = 2. * PI * random(vec2(seed,seed+32.));
     // Radians [0, PI/2]
-	float r2 = PI * hash_poly(seed) / 2.;
+	float r2 = PI * random(vec2(seed+12., seed+684.2)) / 2.;
 
 	float x = cos(r1) * sin(r2);
     float y = sin(r1) * sin(r2);
@@ -264,7 +271,7 @@ float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 	int intersections = 0;
 	int temp_id;
 
-	for(int i = 0; i < 32; ++i){
+	for(int i = 0; i < NUM_AMBIENT_OCCLUSION_SAMPLES; ++i){
 		vec3 random_direction = get_random_hemisphere_ray_direction(normal, float(i));
 		vec3 displaced_origin = sample_point + random_direction * 0.1;
 		float dist = shortest_distance_to_surface(displaced_origin, random_direction, MIN_DISTANCE, MAX_DISTANCE, temp_id);
@@ -273,14 +280,14 @@ float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 		}
 	}
 
-	return float(intersections) / 32.; 
+	return float(intersections) / float(NUM_AMBIENT_OCCLUSION_SAMPLES); 
 }
 
 vec3 compute_lighting(vec3 sample_point, vec3 eye, vec3 normal, Material material) {
     
 	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
     vec3 pix_color = 0.8 * ambient_contribution;
-	pix_color += 0.8 *  (1. - ambient_occlusion_contribution(sample_point, normal)) * ambient_contribution;
+	pix_color += (1. - ambient_occlusion_contribution(sample_point, normal)) * ambient_contribution;
 
 	for(int i = 0; i < NUM_LIGHTS; i ++){
 		pix_color += phong_light_contribution(sample_point, eye, normal, lights[i], material);
