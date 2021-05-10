@@ -280,7 +280,7 @@ vec3 compute_lighting(vec3 p, vec3 eye, vec3 normal, Material material) {
     
 	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
     vec3 pix_color = 0.8 * ambient_contribution;
-	pix_color +=  (1. - ambient_occlusion_contribution(p, normal)) * ambient_contribution;
+	pix_color += 0.8 *  (1. - ambient_occlusion_contribution(p, normal)) * ambient_contribution;
 
 	for(int i = 0; i < NUM_LIGHTS; i ++){
 		pix_color += phong_light_contribution(p, eye, normal, lights[i], material);
