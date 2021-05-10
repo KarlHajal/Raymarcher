@@ -259,14 +259,14 @@ vec3 get_random_hemisphere_ray_direction(vec3 normal, float seed){
     return normalize(u*x+v*y+w*z);
 }
 
-float ambient_occlusion_contribution(vec3 p, vec3 normal){
+float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 
 	int intersections = 0;
 	int temp_id;
 
 	for(int i = 0; i < 32; ++i){
 		vec3 random_direction = get_random_hemisphere_ray_direction(normal, float(i));
-		vec3 displaced_origin = p + random_direction * 0.1;
+		vec3 displaced_origin = sample_point + random_direction * 0.1;
 		float dist = shortest_distance_to_surface(displaced_origin, random_direction, MIN_DISTANCE, MAX_DISTANCE, temp_id);
 		if(dist < MAX_DISTANCE){
 			intersections += 1;
@@ -276,14 +276,14 @@ float ambient_occlusion_contribution(vec3 p, vec3 normal){
 	return float(intersections) / 32.; 
 }
 
-vec3 compute_lighting(vec3 p, vec3 eye, vec3 normal, Material material) {
+vec3 compute_lighting(vec3 sample_point, vec3 eye, vec3 normal, Material material) {
     
 	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
     vec3 pix_color = 0.8 * ambient_contribution;
-	pix_color += 0.8 *  (1. - ambient_occlusion_contribution(p, normal)) * ambient_contribution;
+	pix_color += 0.8 *  (1. - ambient_occlusion_contribution(sample_point, normal)) * ambient_contribution;
 
 	for(int i = 0; i < NUM_LIGHTS; i ++){
-		pix_color += phong_light_contribution(p, eye, normal, lights[i], material);
+		pix_color += phong_light_contribution(sample_point, eye, normal, lights[i], material);
 	}
 
 	return pix_color;
@@ -308,14 +308,14 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 		
 		Material intersected_material = get_mat2(material_id);
 
-		vec3 p = ray_origin + dist * ray_direction;
+		vec3 intersection_point = ray_origin + dist * ray_direction;
 
-		vec3 normal = estimate_normal(p);
+		vec3 normal = estimate_normal(intersection_point);
 		
-		color += (1. - intersected_material.mirror) * product_coeff * compute_lighting(p, ray_origin, normal, intersected_material);
+		color += (1. - intersected_material.mirror) * product_coeff * compute_lighting(intersection_point, ray_origin, normal, intersected_material);
 		product_coeff *= intersected_material.mirror;
 
-		ray_origin = p;
+		ray_origin = intersection_point;
 		ray_direction = reflect(ray_direction, normal);
 		ray_origin += ray_direction*0.01; // To avoid acne
 	}
