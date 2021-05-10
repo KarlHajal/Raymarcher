@@ -77,7 +77,7 @@ export const SCENES = [
 			position: [0, 3, 8], target: [0, 1, 0], up: [0, 1, 0], fov: 45,
 		},
 		materials: [
-			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.6, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.3, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
 		],
 		lights: [
 			{position: [20, 50, 0], color: [1.0, 0.4, 0.2]},
@@ -272,6 +272,43 @@ export const SCENES = [
 		cylinders: [
 			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
 			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+		],
+		mesh: null,
+	})
+
+	SCENES.push({
+		name: 'Ambient-Occlusion',
+		camera: {
+			position: [1, -2, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+		},
+		materials: [
+			{name: 'floor', color: [0., 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+		],
+		lights: [
+			{position: [10, 0, 10], color: [1.0, 1.0, 1.0]},
+			{position: [-10, 0, 10], color: [1.0, 1.0, 1.0]},
+		],
+		spheres: [
+			{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1, 3, 1.1], radius: 0.5, material: 'white'},
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
 		],
 		mesh: null,
 	})

@@ -1,5 +1,7 @@
 precision highp float;
 
+#define PI 3.14159265359
+
 #define MAX_MARCHING_STEPS 255
 #define MIN_DISTANCE 0.0
 #define MAX_DISTANCE 100.0
@@ -234,8 +236,44 @@ vec3 phong_light_contribution(vec3 p, vec3 eye, vec3 normal, Light light, Materi
     return color;
 }
 
+float hash_poly(float x) {
+	return mod(((x*34.0)+1.0)*x, 289.0);
+}
+
+vec3 get_random_hemisphere_ray_direction(vec3 normal){
+	// Radians [0, 2*PI]
+	float r1 = 2. * PI * hash_poly(33.36);
+    // Radians [0, PI/2]
+	float r2 = PI * hash_poly(27.65) / 2.;
+
+	float x = cos(r1) * sin(r2);
+    float y = sin(r1) * sin(r2);
+    float z = cos(r2);
+
+    // Gram Schmidt orthogonalization
+    vec3 unit_x = vec3(1.0, 1.0, 1.0);
+    vec3 w = normal;
+    vec3 u = normalize(cross(normalize(unit_x), w));
+    vec3 v = normalize(cross(w, u));
+	
+    return normalize(u*x+v*y+w*z);
+}
+
 float ambient_occlusion_contribution(vec3 p, vec3 normal){
-	return 0.; 
+
+	int non_intersections = 0;
+	int temp_id;
+
+	for(int i = 0; i < 32; ++i){
+		vec3 random_direction = get_random_hemisphere_ray_direction(normal);
+		vec3 displaced_origin = p + random_direction * 0.1;
+		float dist = shortest_distance_to_surface(displaced_origin, random_direction, MIN_DISTANCE, MAX_DISTANCE, temp_id);
+		if(dist >= MAX_DISTANCE){
+			non_intersections += 1;
+		}
+	}
+
+	return float(non_intersections) / 32.; 
 }
 
 vec3 compute_lighting(vec3 p, vec3 eye, vec3 normal, Material material) {
