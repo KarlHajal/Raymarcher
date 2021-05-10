@@ -266,7 +266,7 @@ export const SCENES = [
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 			{center: [-5, 5, 0], normal: [-2, 1, 0], material: 'mirror'},
-			{center: [ 5, 5, 0], normal: [2, 1, 0], material: 'mirror'},
+			{center: [ 5, 5, 0], normal: [1.5, 1, 0], material: 'mirror'},
 	
 		],
 		cylinders: [
@@ -279,15 +279,15 @@ export const SCENES = [
 	SCENES.push({
 		name: 'Ambient-Occlusion',
 		camera: {
-			position: [1, -2, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 		},
 		materials: [
 			{name: 'floor', color: [0., 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 1., diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 		],
 		lights: [
-			{position: [10, 0, 10], color: [1.0, 1.0, 1.0]},
-			{position: [-10, 0, 10], color: [1.0, 1.0, 1.0]},
+			{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},
+			//{position: [-10, 0, 10], color: [1.0, 1.0, 1.0]},
 		],
 		spheres: [
 			{center: [0, 2, 0.1], radius: 0.5, material: 'white'},

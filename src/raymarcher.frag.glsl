@@ -240,11 +240,11 @@ float hash_poly(float x) {
 	return mod(((x*34.0)+1.0)*x, 289.0);
 }
 
-vec3 get_random_hemisphere_ray_direction(vec3 normal){
+vec3 get_random_hemisphere_ray_direction(vec3 normal, float seed){
 	// Radians [0, 2*PI]
-	float r1 = 2. * PI * hash_poly(33.36);
+	float r1 = 2. * PI * hash_poly(seed*2.);
     // Radians [0, PI/2]
-	float r2 = PI * hash_poly(27.65) / 2.;
+	float r2 = PI * hash_poly(seed) / 2.;
 
 	float x = cos(r1) * sin(r2);
     float y = sin(r1) * sin(r2);
@@ -261,27 +261,26 @@ vec3 get_random_hemisphere_ray_direction(vec3 normal){
 
 float ambient_occlusion_contribution(vec3 p, vec3 normal){
 
-	int non_intersections = 0;
+	int intersections = 0;
 	int temp_id;
 
 	for(int i = 0; i < 32; ++i){
-		vec3 random_direction = get_random_hemisphere_ray_direction(normal);
+		vec3 random_direction = get_random_hemisphere_ray_direction(normal, float(i));
 		vec3 displaced_origin = p + random_direction * 0.1;
 		float dist = shortest_distance_to_surface(displaced_origin, random_direction, MIN_DISTANCE, MAX_DISTANCE, temp_id);
-		if(dist >= MAX_DISTANCE){
-			non_intersections += 1;
+		if(dist < MAX_DISTANCE){
+			intersections += 1;
 		}
 	}
 
-	return float(non_intersections) / 32.; 
+	return float(intersections) / 32.; 
 }
 
 vec3 compute_lighting(vec3 p, vec3 eye, vec3 normal, Material material) {
     
 	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
-    vec3 pix_color = ambient_contribution;
-
-	pix_color += ambient_contribution * ambient_occlusion_contribution(p, normal);
+    vec3 pix_color = 0.8 * ambient_contribution;
+	pix_color +=  (1. - ambient_occlusion_contribution(p, normal)) * ambient_contribution;
 
 	for(int i = 0; i < NUM_LIGHTS; i ++){
 		pix_color += phong_light_contribution(p, eye, normal, lights[i], material);
