@@ -287,7 +287,6 @@ vec3 compute_lighting(vec3 sample_point, vec3 eye, vec3 normal, Material materia
     
 	vec3 ambient_contribution =  material.color * material.ambient * light_color_ambient;
     vec3 pix_color = 0.8 * ambient_contribution;
-	pix_color += (1. - ambient_occlusion_contribution(sample_point, normal)) * ambient_contribution;
 
 	for(int i = 0; i < NUM_LIGHTS; i ++){
 		pix_color += phong_light_contribution(sample_point, eye, normal, lights[i], material);
@@ -313,14 +312,19 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 			break;
 		}
 		
-		Material intersected_material = get_mat2(material_id);
+		Material material = get_mat2(material_id);
 
 		vec3 intersection_point = ray_origin + dist * ray_direction;
 
 		vec3 normal = estimate_normal(intersection_point);
 		
-		color += (1. - intersected_material.mirror) * product_coeff * compute_lighting(intersection_point, ray_origin, normal, intersected_material);
-		product_coeff *= intersected_material.mirror;
+		color += (1. - material.mirror) * product_coeff * compute_lighting(intersection_point, ray_origin, normal, material);
+		
+		if(i_reflection == 0){
+			color += (1. - ambient_occlusion_contribution(intersection_point, normal)) * material.color * material.ambient * light_color_ambient;
+		}
+
+		product_coeff *= material.mirror;
 
 		ray_origin = intersection_point;
 		ray_direction = reflect(ray_direction, normal);
@@ -336,7 +340,6 @@ void main() {
 	vec3 ray_direction = normalize(v2f_ray_direction);
 
 	vec3 pix_color = compute_pixel_color(ray_origin, ray_direction);
-
 	
 	gl_FragColor = vec4(pix_color, 1.);
 }
