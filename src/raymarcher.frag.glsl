@@ -31,6 +31,19 @@ struct Cylinder {
 uniform Cylinder cylinders[NUM_CYLINDERS];
 #endif
 
+//#define NUM_BOXES
+struct Box {
+	vec3 center;
+	float length;
+	float width;
+	float height;
+	float rotation_x;
+	float rotation_y;
+	float rotation_z;
+};
+#if NUM_BOXES != 0
+uniform Box boxes[NUM_BOXES];
+#endif
 
 //#define NUM_TRIANGLES
 struct Triangle {
@@ -57,8 +70,8 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_TRIANGLES != 0)
-uniform int object_material_id[NUM_SPHERES+NUM_PLANES+NUM_CYLINDERS];
+#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0)
+uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES];
 #endif
 //#define NUM_LIGHTS
 struct Light {
@@ -83,30 +96,63 @@ Material get_mat2(int mat_id) {
 	return m;
 }
 
+mat4 rotation_x (float angle) {
+	return mat4(1.0, 0., 0., 0.,
+			 	0., cos(angle), -sin(angle), 0.,
+				0., sin(angle), cos(angle),	0.,
+				0.,	0., 0., 1.);
+}
+
+mat4 rotation_y(float angle) {
+	return mat4(cos(angle),	0., sin(angle), 0.,
+			 	0., 1.0,	0., 0.,
+				-sin(angle), 0.,	cos(angle),	0.,
+				0., 0., 0., 1.);
+}
+
+mat4 rotation_z(float angle) {
+	return mat4(cos(angle),	-sin(angle), 0., 0.,
+			 	sin(angle),	cos(angle),	0., 0.,
+				0., 0., 1., 0.,
+				0., 0., 0., 1.);
+}
+
+
+
 float sphere_sdf(vec3 sample_point, vec3 sphere_center, float sphere_radius) {
     return length(sphere_center - sample_point) - sphere_radius;
 }
 
-float plane_sdf(vec3 sample_point, vec3 plane_normal, vec3 point_on_plane)
-{
+float plane_sdf(vec3 sample_point, vec3 plane_normal, vec3 point_on_plane) {
 	return abs(dot(sample_point - point_on_plane, plane_normal));
 }
 
-float capped_cylinder_sdf(vec3 p, vec3 cylinder_center, vec3 cylinder_axis, float cylinder_height, float cylinder_radius)
-{
-	vec3 bottom_center = cylinder_center + cylinder_axis * cylinder_height/2.;
-	vec3 top_center = cylinder_center - cylinder_axis * cylinder_height/2.;
+float capped_cylinder_sdf(vec3 sample_point, Cylinder cylinder) {
+	vec3 bottom_center = cylinder.center + cylinder.axis * cylinder.height/2.;
+	vec3 top_center = cylinder.center - cylinder.axis * cylinder.height/2.;
 
 	vec3  ba = top_center - bottom_center;
-	vec3  pa = p - bottom_center;
+	vec3  pa = sample_point - bottom_center;
 	float baba = dot(ba,ba);
 	float paba = dot(pa,ba);
-	float x = length(pa*baba-ba*paba) - cylinder_radius*baba;
+	float x = length(pa*baba-ba*paba) - cylinder.radius*baba;
 	float y = abs(paba-baba*0.5)-baba*0.5;
 	float x2 = x*x;
 	float y2 = y*y*baba;
 	float d = (max(x,y)<0.0)?-min(x2,y2):(((x>0.0)?x2:0.0)+((y>0.0)?y2:0.0));
 	return sign(d)*sqrt(abs(d))/baba;
+}
+
+vec3 transform_point_to_centered_shape(vec3 point, vec3 shape_center, float shape_rotation_x, float shape_rotation_y, float shape_rotation_z){
+	vec4 translated_point = vec4((point - shape_center), 1.0);
+	return (translated_point * rotation_x(-shape_rotation_x) * rotation_y(-shape_rotation_y) * rotation_z(-shape_rotation_z)).xyz;
+}
+
+float box_sdf(vec3 sample_point, Box box){
+	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
+	vec3 b = vec3(box.length, box.width, box.height)/2.;
+	vec3 q = abs(transformed_point) - b; 
+  	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
 }
 
 float sceneSDF(vec3 sample_point, out int material_id) {
@@ -149,28 +195,30 @@ float sceneSDF(vec3 sample_point, out int material_id) {
 	#if NUM_CYLINDERS != 0 
 	for(int i = 0; i < NUM_CYLINDERS; i++) {
 		Cylinder cylinder = cylinders[i];
-		float object_distance = capped_cylinder_sdf(sample_point, cylinder.center, cylinder.axis, cylinder.height, cylinder.radius);
+		float object_distance = capped_cylinder_sdf(sample_point, cylinder);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES+NUM_PLANES+i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + i];
+		}
+	}
+	#endif
+
+
+	#if NUM_BOXES != 0
+	for(int i = 0; i < NUM_BOXES; ++i) {
+		Box box = boxes[i];
+		float object_distance = box_sdf(sample_point, box);
+
+		if(object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + i];
 		}
 	}
 	#endif
 
     return min_distance;
 }
-
-/*
-vec3 estimate_normal(vec3 p) {
-	int temp_id;
-    return normalize(vec3(
-        sceneSDF(vec3(p.x + EPSILON, p.y, p.z), temp_id) - sceneSDF(vec3(p.x - EPSILON, p.y, p.z), temp_id),
-        sceneSDF(vec3(p.x, p.y + EPSILON, p.z), temp_id) - sceneSDF(vec3(p.x, p.y - EPSILON, p.z), temp_id),
-        sceneSDF(vec3(p.x, p.y, p.z  + EPSILON), temp_id) - sceneSDF(vec3(p.x, p.y, p.z - EPSILON), temp_id)
-    ));
-}
-*/
 
 vec3 estimate_normal(vec3 p ) // Tetrahedron technique
 {

@@ -3,6 +3,7 @@ import {load_text} from "./icg_web.js"
 import {framebuffer_to_image_download} from "./icg_screenshot.js"
 import {load_mesh_obj} from "./icg_mesh.js"
 import * as vec3 from "../lib/gl-matrix_3.3.0/esm/vec3.js"
+import { toRadian } from "../lib/gl-matrix_3.3.0/esm/common.js"
 
 const mesh_quad_2d = {
 	position: [
@@ -55,7 +56,7 @@ export class Raymarcher {
 	}
 
 	ray_marcher_pipeline_for_scene(scene) {
-		const {name, camera, materials, lights, spheres, planes, cylinders, mesh} = scene
+		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, mesh} = scene
 
 		const uniforms = {}
 		Object.assign(uniforms, this.gen_uniforms_camera(camera))
@@ -133,6 +134,21 @@ export class Raymarcher {
 		// Fill NUM_CYLINDERS in shader source
 		code_injections['NUM_CYLINDERS'] = cylinders.length.toFixed(0)
 		
+
+		// Boxes
+		boxes.forEach((box, idx) => {
+			uniforms[`boxes[${idx}].center`] = box.center
+			uniforms[`boxes[${idx}].length`] = box.length
+			uniforms[`boxes[${idx}].width`] = box.width
+			uniforms[`boxes[${idx}].height`] = box.height
+			uniforms[`boxes[${idx}].rotation_x`] = toRadian(box.rotation_x)
+			uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
+			uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
+
+			next_object_material(box.material)
+		})
+		// Fill NUM_BOXES in shader source
+		code_injections['NUM_BOXES'] = boxes.length.toFixed(0)
 
 		// Mesh
 		/*

@@ -29,6 +29,8 @@ export const SCENES = [
 		cylinders: [
 			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], material: 'green'},
 		],
+		boxes: [
+		],
 		mesh: null,
 	},
 	{
@@ -47,6 +49,8 @@ export const SCENES = [
 			{center: [0.0, 0., 1.], normal: [0., 0., 1.], material: 'green'},
 			{center: [0.0, 0., 0.], normal: [0., 1., 0.], material: 'green'},
 			{center: [-0.3, 0., 0.], normal: [1., 0., 0.], material: 'green'},
+		],
+		boxes: [
 		],
 		cylinders: [],
 		mesh: null,
@@ -69,6 +73,8 @@ export const SCENES = [
 		cylinders: [
 			{center: [0.0, 0.0, 0.0], radius: 0.1, height: 0.5, axis: [0., 0., 1.], material: 'white'},
 		],
+		boxes: [
+		],
 		mesh: null,
 	},
 	{
@@ -90,6 +96,8 @@ export const SCENES = [
 			{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], material: 'white'},
 			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
 			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
+		],
+		boxes: [
 		],
 		mesh: null,
 	}
@@ -115,6 +123,8 @@ export const SCENES = [
 		cylinders: [
 			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
 			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+		],
+		boxes: [
 		],
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
@@ -143,6 +153,8 @@ export const SCENES = [
 			const r = 3
 			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, material: 'shiny' }
 		}),
+		boxes: [
+		],
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
@@ -169,6 +181,8 @@ export const SCENES = [
 		cylinders: [
 			// {center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
 			// {center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+		],
+		boxes: [
 		],
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
@@ -204,6 +218,8 @@ export const SCENES = [
 			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
 			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
 		],
+		boxes: [
+		],
 		mesh: null,
 	})
 	
@@ -236,6 +252,8 @@ export const SCENES = [
 			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
 			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
 			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+		],
+		boxes: [
 		],
 		mesh: null,
 	})
@@ -272,6 +290,8 @@ export const SCENES = [
 		cylinders: [
 			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
 			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+		],
+		boxes: [
 		],
 		mesh: null,
 	})
@@ -319,9 +339,38 @@ export const SCENES = [
 			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
 			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
 		],
+		boxes: [
+		],
 		mesh: null,
 	})
 	
+	SCENES.push({
+		name: 'Box',
+		camera: {
+			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+		},
+		materials: [
+			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.5, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.8, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+		],
+		lights: [
+			{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},
+		],
+		spheres: [
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+		],
+		boxes: [
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, material: 'white'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, material: 'white'},
+			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, material: 'white'}
+		],
+		mesh: null,
+	})
 	
 	
 	export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))
