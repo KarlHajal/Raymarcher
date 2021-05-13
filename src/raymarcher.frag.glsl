@@ -40,6 +40,7 @@ struct Box {
 	float rotation_x;
 	float rotation_y;
 	float rotation_z;
+	float rounded_edges_radius;
 };
 #if NUM_BOXES != 0
 uniform Box boxes[NUM_BOXES];
@@ -152,7 +153,7 @@ float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
 	vec3 q = abs(transformed_point) - b; 
-  	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0);
+  	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
 }
 
 float sceneSDF(vec3 sample_point, out int material_id) {

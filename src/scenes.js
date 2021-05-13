@@ -350,11 +350,12 @@ export const SCENES = [
 			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 		},
 		materials: [
-			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.5, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
+			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
 			{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.8, diffuse: 0., specular: 0., shininess: 0., mirror: 0.},
 		],
 		lights: [
-			{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},
+			{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
+			{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 		],
 		spheres: [
 		],
@@ -364,10 +365,12 @@ export const SCENES = [
 		cylinders: [
 		],
 		boxes: [
-			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, material: 'white'},
-			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, material: 'white'},
-			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, material: 'white'},
-			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, material: 'white'}
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0,  material: 'white'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, material: 'white'},
+			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, material: 'white'},
+			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
 		],
 		mesh: null,
 	})

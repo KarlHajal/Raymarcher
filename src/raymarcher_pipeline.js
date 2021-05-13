@@ -144,6 +144,7 @@ export class Raymarcher {
 			uniforms[`boxes[${idx}].rotation_x`] = toRadian(box.rotation_x)
 			uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
 			uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
+			uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
 
 			next_object_material(box.material)
 		})
