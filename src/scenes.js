@@ -429,6 +429,8 @@ export const SCENES = [
 			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
 			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
 		],
+		toruses: [
+		],
 		mesh: null,
 	})
 	
