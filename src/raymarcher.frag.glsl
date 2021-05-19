@@ -46,6 +46,20 @@ struct Box {
 uniform Box boxes[NUM_BOXES];
 #endif
 
+//#define NUM_TORUSES
+struct Torus {
+	vec3 center;
+	vec2 radi; // x = big radius, y = small radius
+	float rotation_x;
+	float rotation_y;
+	float rotation_z;
+};
+#if NUM_TORUSES != 0
+uniform Torus toruses[NUM_TORUSES];
+#endif
+
+
+
 //#define NUM_TRIANGLES
 struct Triangle {
 	mat3 vertices;
@@ -71,8 +85,8 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0)
-uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES];
+#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0) || (NUM_TORUSES != 0)
+uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES];
 #endif
 //#define NUM_LIGHTS
 struct Light {
@@ -149,6 +163,14 @@ vec3 transform_point_to_centered_shape(vec3 point, vec3 shape_center, float shap
 	return (translated_point * rotation_x(-shape_rotation_x) * rotation_y(-shape_rotation_y) * rotation_z(-shape_rotation_z)).xyz;
 }
 
+float torus_sdf(vec3 sample_point, Torus torus) {
+	vec3 transformed_point = transform_point_to_centered_shape(sample_point, torus.center, torus.rotation_x, torus.rotation_y, torus.rotation_z);
+	vec2 q = vec2(length(transformed_point.xz)-torus.radi.x, transformed_point.y);
+	return length(q) - torus.radi.y;
+}
+
+
+
 float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
@@ -214,6 +236,18 @@ float sceneSDF(vec3 sample_point, out int material_id) {
 		if(object_distance < min_distance) {
 			min_distance = object_distance;
 			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + i];
+		}
+	}
+	#endif
+	
+	#if NUM_TORUSES != 0
+	for(int i = 0; i < NUM_TORUSES; ++i) {
+		Torus torus = toruses[i];
+		float object_distance = torus_sdf(sample_point, torus);
+
+		if(object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + i];
 		}
 	}
 	#endif
