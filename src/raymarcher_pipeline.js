@@ -56,7 +56,7 @@ export class Raymarcher {
 	}
 
 	ray_marcher_pipeline_for_scene(scene) {
-		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, mesh} = scene
+		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, toruses, mesh} = scene
 
 		const uniforms = {}
 		Object.assign(uniforms, this.gen_uniforms_camera(camera))
@@ -150,6 +150,21 @@ export class Raymarcher {
 		})
 		// Fill NUM_BOXES in shader source
 		code_injections['NUM_BOXES'] = boxes.length.toFixed(0)
+		
+		
+		toruses.forEach((torus, idx) => {
+			uniforms[`toruses[${idx}].center`] = torus.center
+			uniforms[`toruses[${idx}].radi`  ] = torus.radi
+			uniforms[`toruses[${idx}].rotation_x`] = toRadian(torus.rotation_x)
+			uniforms[`toruses[${idx}].rotation_y`] = toRadian(torus.rotation_y)
+			uniforms[`toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
+			
+			next_object_material(torus.material)
+		})
+		// Fill NUM_TORUSES in shader source
+		code_injections['NUM_TORUSES'] = toruses.length.toFixed(0)
+		
+		
 
 		// Mesh
 		/*

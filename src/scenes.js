@@ -31,6 +31,8 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [
+		],
 		mesh: null,
 	},
 	{
@@ -53,6 +55,7 @@ export const SCENES = [
 		boxes: [
 		],
 		cylinders: [],
+		toruses: [],
 		mesh: null,
 	},
 	{
@@ -75,6 +78,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	},
 	{
@@ -99,6 +103,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	}
 	]
@@ -130,6 +135,7 @@ export const SCENES = [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
+		toruses: [],
 	})
 	
 	SCENES.push({
@@ -158,6 +164,7 @@ export const SCENES = [
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
+		toruses: [],
 	})
 	
 	SCENES.push({
@@ -188,6 +195,7 @@ export const SCENES = [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
+		toruses: [],
 	})
 	
 	SCENES.push({
@@ -220,6 +228,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	})
 	
@@ -255,6 +264,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	})
 	
@@ -293,6 +303,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	})
 
@@ -341,6 +352,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	})
 
@@ -385,6 +397,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
+		toruses: [],
 		mesh: null,
 	})
 	
@@ -416,8 +429,41 @@ export const SCENES = [
 			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
 			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
 		],
+		toruses: [
+			{center: [1,0,0], radi: [1,2], rotation_x : 0, rotation_y : 0, rotation_z : 0, material : 'white'},
+		],
 		mesh: null,
 	})
+	
+	SCENES.push({
+		name: 'Torus',
+		camera: {
+			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+		},
+		materials: [
+			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+			{name: 'white', color: [0.9, 0.9, 0.9],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		],
+		lights: [
+			{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
+		],
+		spheres: [
+		],
+		planes: [
+			{center: [0, 0, -3], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+		],
+		boxes: [
+		],
+		toruses: [
+			{center: [1,0,0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'white'},
+			{center: [4,3,0],  radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : 45 , material : 'white'},
+			{center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45, material : 'white'},
+		],
+		mesh: null,
+	})
+	
 	
 	
 	export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))
