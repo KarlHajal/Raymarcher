@@ -26,10 +26,77 @@ struct Cylinder {
 	vec3 axis;
 	float radius;
 	float height;
+	int is_capsule;
 };
 #if NUM_CYLINDERS != 0
 uniform Cylinder cylinders[NUM_CYLINDERS];
 #endif
+
+//#define NUM_CONES
+struct Cone {
+	vec3 center;
+	vec2 sin_cos;
+	float height;
+};
+#if NUM_CONES != 0
+uniform Cone cones[NUM_CONES];
+#endif
+
+//#define NUM_HEXAGONALS
+struct Hexagonal {
+	vec3 center;
+	vec2 heights;
+};
+#if NUM_HEXAGONALS != 0
+uniform Hexagonal hexagonals[NUM_HEXAGONALS];
+#endif
+
+//#define NUM_TRIANGULARS
+struct Triangular {
+	vec3 center;
+	vec2 heights;
+};
+#if NUM_TRIANGULARS != 0
+uniform Triangular triangulars[NUM_TRIANGULARS];
+#endif
+
+//#define NUM_SOLIDS
+struct Solid {
+	vec3 center;
+	vec2 sin_cos;
+	float radius;
+};
+#if NUM_SOLIDS != 0
+uniform Solid solids[NUM_SOLIDS];
+#endif
+
+//#define NUM_ELLIPSOIDS
+struct Ellipsoid {
+	vec3 center;
+	vec3 radius;
+};
+#if NUM_ELLIPSOIDS != 0
+uniform Ellipsoid ellipsoids[NUM_ELLIPSOIDS];
+#endif
+
+//#define NUM_OCTAHEDRONS
+struct Octahedron {
+	vec3 center;
+	float length;
+};
+#if NUM_OCTAHEDRONS != 0
+uniform Octahedron octahedrons[NUM_OCTAHEDRONS];
+#endif
+
+//#define NUM_PYRAMIDS
+struct Pyramid {
+	vec3 center;
+	float height;
+};
+#if NUM_PYRAMIDS != 0
+uniform Pyramid pyramids[NUM_PYRAMIDS];
+#endif
+
 
 //#define NUM_BOXES
 struct Box {
@@ -41,14 +108,28 @@ struct Box {
 	float rotation_y;
 	float rotation_z;
 	float rounded_edges_radius;
+	int is_frame; 
 };
 #if NUM_BOXES != 0
 uniform Box boxes[NUM_BOXES];
 #endif
 
+//#define NUM_LINKS
+struct Link {
+	vec3 center;
+	float length;
+	float radius1;
+	float radius2;
+};
+#if NUM_LINKS != 0
+uniform Link links[NUM_LINKS];
+#endif
+
 //#define NUM_TRIANGLES
 struct Triangle {
-	mat3 vertices;
+	vec3 vertice1;
+	vec3 vertice2;
+	vec3 vertice3;
 // 	mat3 normals;
 };
 struct AABB {
@@ -71,8 +152,8 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0)
-uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES];
+#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0) || (NUM_LINKS != 0) || (NUM_CONES != 0) || (NUM_HEXAGONALS != 0) || (NUM_TRIANGULARS != 0) || (NUM_SOLIDS != 0) || (NUM_ELLIPSOIDS != 0) || (NUM_OCTAHEDRONS != 0) || (NUM_PYRAMIDS != 0) 
+uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_SOLIDS + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + NUM_PYRAMIDS];
 #endif
 //#define NUM_LIGHTS
 struct Light {
@@ -134,6 +215,12 @@ float capped_cylinder_sdf(vec3 sample_point, Cylinder cylinder) {
 
 	vec3  ba = top_center - bottom_center;
 	vec3  pa = sample_point - bottom_center;
+	
+	if(cylinder.is_capsule == 1){
+		float h = clamp( dot(pa,ba)/dot(ba,ba), 0.0, 1.0 );
+		return length( pa - ba*h ) - cylinder.radius;
+	}
+
 	float baba = dot(ba,ba);
 	float paba = dot(pa,ba);
 	float x = length(pa*baba-ba*paba) - cylinder.radius*baba;
@@ -142,6 +229,35 @@ float capped_cylinder_sdf(vec3 sample_point, Cylinder cylinder) {
 	float y2 = y*y*baba;
 	float d = (max(x,y)<0.0)?-min(x2,y2):(((x>0.0)?x2:0.0)+((y>0.0)?y2:0.0));
 	return sign(d)*sqrt(abs(d))/baba;
+}
+
+float dot2( in vec3 v ) { return dot(v,v); }
+
+
+float triangle_sdf( vec3 p, vec3 a, vec3 b, vec3 c ){
+	vec3 ba = b - a; vec3 pa = p - a;
+	vec3 cb = c - b; vec3 pb = p - b;
+	vec3 ac = a - c; vec3 pc = p - c;
+	vec3 nor = cross( ba, ac );
+
+	return sqrt(
+		(sign(dot(cross(ba,nor),pa)) +
+		sign(dot(cross(cb,nor),pb)) +
+		sign(dot(cross(ac,nor),pc))<2.0)
+		?
+		min( min(
+		dot2(ba*clamp(dot(ba,pa)/dot2(ba),0.0,1.0)-pa),
+		dot2(cb*clamp(dot(cb,pb)/dot2(cb),0.0,1.0)-pb) ),
+		dot2(ac*clamp(dot(ac,pc)/dot2(ac),0.0,1.0)-pc) )
+		:
+		dot(nor,pa)*dot(nor,pa)/dot2(nor) );
+}
+
+float link_sdf( vec3 p, float le, float r1, float r2 , vec3 center)
+{
+	vec3 p2 = p - center; 
+	vec3 q = vec3( p2.x, max(abs(p2.y)-le,0.0), p2.z);
+	return length(vec2(length(q.xy)-r1,q.z)) - r2 ;
 }
 
 vec3 transform_point_to_centered_shape(vec3 point, vec3 shape_center, float shape_rotation_x, float shape_rotation_y, float shape_rotation_z){
@@ -153,7 +269,106 @@ float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
 	vec3 q = abs(transformed_point) - b; 
+	if(box.is_frame == 1){
+		vec3 p = q;
+		vec3 q = abs(p + 0.05) - 0.05;
+		return min(min(
+					length(max(vec3(p.x,q.y,q.z),0.0))+min(max(p.x,max(q.y,q.z)),0.0),
+					length(max(vec3(q.x,p.y,q.z),0.0))+min(max(q.x,max(p.y,q.z)),0.0)),
+					length(max(vec3(q.x,q.y,p.z),0.0))+min(max(q.x,max(q.y,p.z)),0.0)) - box.rounded_edges_radius;
+	}
   	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
+}
+
+float cone_sdf( in vec3 p, in vec2 c, float h, vec3 center )
+{
+	// c is the sin/cos of the angle, h is height
+	// Alternatively pass q instead of (c,h),
+	// which is the point at the base in 2D
+	vec3 p2 = p - center;
+	vec2 q = h*vec2(c.x/c.y,-1.0);
+		
+	vec2 w = vec2( length(p2.xz), p2.y );
+	vec2 a = w - q*clamp( dot(w,q)/dot(q,q), 0.0, 1.0 );
+	vec2 b = w - q*vec2( clamp( w.x/q.x, 0.0, 1.0 ), 1.0 );
+	float k = sign( q.y );
+	float d = min(dot( a, a ),dot(b, b));
+	float s = max( k*(w.x*q.y-w.y*q.x),k*(w.y-q.y)  );
+	return sqrt(d)*sign(s);
+}
+
+float hex_prism_sdf( vec3 p, vec3 center, vec2 h )
+{
+	vec3 p2 = p - center;
+	const vec3 k = vec3(-0.8660254, 0.5, 0.57735);
+	p2 = abs(p2);
+	p2.xy -= 2.0*min(dot(k.xy, p2.xy), 0.0)*k.xy;
+	vec2 d = vec2(
+		length(p2.xy-vec2(clamp(p2.x,-k.z*h.x,k.z*h.x), h.x))*sign(p2.y-h.x),
+		p2.z-h.y );
+	return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
+float triangular_sdf( vec3 p, vec3 center, vec2 h )
+{
+	p = p - center;
+	vec3 q = abs(p);
+	return max(q.z-h.y,max(q.x*0.866025+p.y*0.5,-p.y)-h.x*0.5);
+}
+
+float solid_angle_sdf(vec3 p, vec3 center, vec2 c, float ra)
+{
+  // c is the sin/cos of the angle
+  p = p - center;
+  vec2 q = vec2( length(p.xz), p.y );
+  float l = length(q) - ra;
+  float m = length(q - c*clamp(dot(q,c),0.0,ra) );
+  return max(l,m*sign(c.y*q.x-c.x*q.y));
+}
+
+float ellipsoid_sdf( vec3 p, vec3 center, vec3 r )
+{
+	p = p - center;
+	float k0 = length(p/r);
+	float k1 = length(p/(r*r));
+	return k0*(k0-1.0)/k1;
+}
+
+float octahedron_sdf( vec3 p, vec3 center, float s)
+{
+	p = p - center;
+	p = abs(p);
+	float m = p.x+p.y+p.z-s;
+	vec3 q;
+		if( 3.0*p.x < m ) q = p.xyz;
+	else if( 3.0*p.y < m ) q = p.yzx;
+	else if( 3.0*p.z < m ) q = p.zxy;
+	else return m*0.57735027;
+		
+	float k = clamp(0.5*(q.z-q.y+s),0.0,s); 
+	return length(vec3(q.x,q.y-s+k,q.z-k)); 
+}
+
+float pyramid_sdf( vec3 p, vec3 center, float h)
+{
+	p = p - center;
+	float m2 = h*h + 0.25;
+		
+	p.xz = abs(p.xz);
+	p.xz = (p.z>p.x) ? p.zx : p.xz;
+	p.xz -= 0.5;
+
+	vec3 q = vec3( p.z, h*p.y - 0.5*p.x, h*p.x + 0.5*p.y);
+	
+	float s = max(-q.x,0.0);
+	float t = clamp( (q.y-0.5*p.z)/(m2+0.25), 0.0, 1.0 );
+		
+	float a = m2*(q.x+s)*(q.x+s) + q.y*q.y;
+	float b = m2*(q.x+0.5*t)*(q.x+0.5*t) + (q.y-m2*t)*(q.y-m2*t);
+		
+	float d2 = min(q.y,-q.x*m2-q.y*0.5) > 0.0 ? 0.0 : min(a,b);
+		
+	return sqrt( (d2+q.z*q.z)/m2 ) * sign(max(q.z,-p.y));
 }
 
 float sceneSDF(vec3 sample_point, out int material_id) {
@@ -214,6 +429,123 @@ float sceneSDF(vec3 sample_point, out int material_id) {
 		if(object_distance < min_distance) {
 			min_distance = object_distance;
 			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + i];
+		}
+	}
+	#endif
+
+	#if NUM_TRIANGLES != 0
+	for(int i = 0; i < NUM_TRIANGLES; i++) {
+
+
+		float object_distance = triangle_sdf(sample_point, triangles[i].vertice1, triangles[i].vertice2, triangles[i].vertice3);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + i];
+		}
+	}
+	#endif
+
+	#if NUM_LINKS != 0
+	for(int i = 0; i < NUM_LINKS; i++) {
+
+
+		float object_distance = link_sdf(sample_point, links[i].length, links[i].radius1, links[i].radius2, links[i].center);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + i];
+		}
+	}
+	#endif
+
+	#if NUM_CONES != 0
+	for(int i = 0; i < NUM_CONES; i++) {
+
+
+		float object_distance = cone_sdf(sample_point, cones[i].sin_cos, cones[i].height, cones[i].center);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + i];
+		}
+	}
+	#endif
+
+	#if NUM_HEXAGONALS != 0
+	for(int i = 0; i < NUM_HEXAGONALS; i++) {
+
+
+		float object_distance = hex_prism_sdf(sample_point, hexagonals[i].center, hexagonals[i].heights);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + i];
+		}
+	}
+	#endif
+
+	#if NUM_TRIANGULARS != 0
+	for(int i = 0; i < NUM_TRIANGULARS; i++) {
+
+
+		float object_distance = triangular_sdf(sample_point, triangulars[i].center, triangulars[i].heights);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + i];
+		}
+	}
+	#endif
+
+	#if NUM_SOLIDS != 0
+	for(int i = 0; i < NUM_SOLIDS; i++) {
+
+
+		float object_distance = solid_angle_sdf(sample_point, solids[i].center, solids[i].sin_cos, solids[i].radius);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + i];
+		}
+	}
+	#endif
+
+	#if NUM_ELLIPSOIDS != 0
+	for(int i = 0; i < NUM_ELLIPSOIDS; i++) {
+
+
+		float object_distance = ellipsoid_sdf(sample_point, ellipsoids[i].center, ellipsoids[i].radius);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_SOLIDS + i];
+		}
+	}
+	#endif
+
+	#if NUM_OCTAHEDRONS != 0
+	for(int i = 0; i < NUM_OCTAHEDRONS; i++) {
+
+
+		float object_distance = octahedron_sdf(sample_point, octahedrons[i].center, octahedrons[i].length);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_SOLIDS + NUM_ELLIPSOIDS + i];
+		}
+	}
+	#endif
+
+	#if NUM_PYRAMIDS != 0
+	for(int i = 0; i < NUM_PYRAMIDS; i++) {
+
+
+		float object_distance = pyramid_sdf(sample_point, pyramids[i].center, pyramids[i].height);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_SOLIDS + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + i];
 		}
 	}
 	#endif

@@ -56,7 +56,7 @@ export class Raymarcher {
 	}
 
 	ray_marcher_pipeline_for_scene(scene) {
-		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, mesh} = scene
+		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, triangles, links, cones, hexagonals, triangulars, solids, ellipsoids, octahedrons, pyramids, mesh} = scene
 
 		const uniforms = {}
 		Object.assign(uniforms, this.gen_uniforms_camera(camera))
@@ -79,7 +79,7 @@ export class Raymarcher {
 			uniforms[`materials[${idx}].mirror`] = mat.mirror
 		})
 		code_injections['NUM_MATERIALS'] = materials.length.toFixed(0)
-
+		
 		// Lights
 		lights.forEach((li, idx) => {
 			uniforms[`lights[${idx}].position`] = li.position
@@ -93,6 +93,7 @@ export class Raymarcher {
 		let num_objects = 0;
 
 		function next_object_material(mat_name) {
+			console.log(mat_name)
 			object_material_id[num_objects] = material_id_by_name[mat_name]
 			//uniforms[`object_material_id[${num_objects}]`] = material_id_by_name[mat_name]
 			num_objects += 1
@@ -128,6 +129,7 @@ export class Raymarcher {
 			uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
 			uniforms[`cylinders[${idx}].radius`] = cyl.radius
 			uniforms[`cylinders[${idx}].height`] = cyl.height
+			uniforms[`cylinders[${idx}].is_capsule`] = cyl.is_capsule
 			
 			next_object_material(cyl.material)
 		})
@@ -145,6 +147,8 @@ export class Raymarcher {
 			uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
 			uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
 			uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
+			uniforms[`boxes[${idx}].is_frame`] = box.is_frame
+
 
 			next_object_material(box.material)
 		})
@@ -169,7 +173,92 @@ export class Raymarcher {
 			//uniforms[`triangles[${i_face}].normal`] = 
 		}
 		*/
-		code_injections['NUM_TRIANGLES'] = 0
+
+		// triangles
+		triangles.forEach((triangle, idx) => {
+			uniforms[`triangles[${idx}].vertice1`] = triangle.vertice1
+			uniforms[`triangles[${idx}].vertice2`] = triangle.vertice2
+			uniforms[`triangles[${idx}].vertice3`] = triangle.vertice3
+
+			next_object_material(triangle.material)
+		})
+		code_injections['NUM_TRIANGLES'] = triangles.length.toFixed(0)
+
+		// links
+		links.forEach((link, idx) => {
+			uniforms[`links[${idx}].center`] = link.center
+			uniforms[`links[${idx}].length`] = link.length
+			uniforms[`links[${idx}].radius1`] = link.radius1
+			uniforms[`links[${idx}].radius2`] = link.radius2
+
+			next_object_material(link.material)
+		})
+		code_injections['NUM_LINKS'] = links.length.toFixed(0)
+
+		// cones
+		cones.forEach((cone, idx) => {
+			uniforms[`cones[${idx}].center`] = cone.center
+			uniforms[`cones[${idx}].height`] = cone.height
+			uniforms[`cones[${idx}].sin_cos`] = cone.sin_cos
+
+			next_object_material(cone.material)
+		})
+		code_injections['NUM_CONES'] = cones.length.toFixed(0)
+
+		// hexagonals
+		hexagonals.forEach((hexagonal, idx) => {
+			uniforms[`hexagonals[${idx}].center`] = hexagonal.center
+			uniforms[`hexagonals[${idx}].heights`] = hexagonal.heights
+
+			next_object_material(hexagonal.material)
+		})
+		code_injections['NUM_HEXAGONALS'] = hexagonals.length.toFixed(0)
+
+		// triangulars
+		triangulars.forEach((triangular, idx) => {
+			uniforms[`triangulars[${idx}].center`] = triangular.center
+			uniforms[`triangulars[${idx}].heights`] = triangular.heights
+
+			next_object_material(triangular.material)
+		})
+		code_injections['NUM_TRIANGULARS'] = triangulars.length.toFixed(0)
+
+		// solids
+		solids.forEach((solid, idx) => {
+			uniforms[`solids[${idx}].center`] = solid.center
+			uniforms[`solids[${idx}].sin_cos`] = solid.sin_cos
+			uniforms[`solids[${idx}].radius`] = solid.radius
+
+			next_object_material(solid.material)
+		})
+		code_injections['NUM_SOLIDS'] = solids.length.toFixed(0)
+
+		// ellipsoids
+		ellipsoids.forEach((ellipsoid, idx) => {
+			uniforms[`ellipsoids[${idx}].center`] = ellipsoid.center
+			uniforms[`ellipsoids[${idx}].radius`] = ellipsoid.radius
+
+			next_object_material(ellipsoid.material)
+		})
+		code_injections['NUM_ELLIPSOIDS'] = ellipsoids.length.toFixed(0)
+
+		// octahedrons
+		octahedrons.forEach((octahedron, idx) => {
+			uniforms[`octahedrons[${idx}].center`] = octahedron.center
+			uniforms[`octahedrons[${idx}].length`] = octahedron.length
+
+			next_object_material(octahedron.material)
+		})
+		code_injections['NUM_OCTAHEDRONS'] = octahedrons.length.toFixed(0)
+
+		// pyramids
+		pyramids.forEach((pyramid, idx) => {
+			uniforms[`pyramids[${idx}].center`] = pyramid.center
+			uniforms[`pyramids[${idx}].height`] = pyramid.height
+
+			next_object_material(pyramid.material)
+		})
+		code_injections['NUM_PYRAMIDS'] = pyramids.length.toFixed(0)
 
 		// regl 2.1.0 loads a uniform array all at once
 		if(object_material_id.length > 1) {
@@ -178,6 +267,7 @@ export class Raymarcher {
 			uniforms['object_material_id[0]'] = object_material_id[0]
 		}
 
+		console.log(code_injections)
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		
 		const pipeline_raymarcher = this.regl({

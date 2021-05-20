@@ -27,9 +27,27 @@ export const SCENES = [
 			{center: [0.0, -1., 0.], normal: [0., 1., 0.], material: 'mirror'}, // bottom
 		],
 		cylinders: [
-			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], material: 'green'},
+			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], is_capsule:0, material: 'green'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	},
@@ -50,9 +68,28 @@ export const SCENES = [
 			{center: [0.0, 0., 0.], normal: [0., 1., 0.], material: 'green'},
 			{center: [-0.3, 0., 0.], normal: [1., 0., 0.], material: 'green'},
 		],
+		cylinders: [	
+		],
 		boxes: [
 		],
-		cylinders: [],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
+		],
 		mesh: null,
 	},
 	{
@@ -71,9 +108,27 @@ export const SCENES = [
 		],
 		planes: [],
 		cylinders: [
-			{center: [0.0, 0.0, 0.0], radius: 0.1, height: 0.5, axis: [0., 0., 1.], material: 'white'},
+			{center: [0.0, 0.0, 0.0], radius: 0.1, height: 0.5, axis: [0., 0., 1.], is_capsule:0, material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	},
@@ -93,11 +148,29 @@ export const SCENES = [
 		spheres: [],
 		planes: [],
 		cylinders: [
-			{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], material: 'white'},
-			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
-			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
+			{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], is_capsule:0, material: 'white'},
+			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], is_capsule:0, material: 'white'},
+			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], is_capsule:0, material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	}
@@ -121,14 +194,32 @@ export const SCENES = [
 			{center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
 		],
 		cylinders: [
-			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
-			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, is_capsule:0, material: 'shiny'},
+			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, is_capsule:0, material: 'white'},
 		],
 		boxes: [
 		],
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 	})
 	
@@ -151,12 +242,30 @@ export const SCENES = [
 		cylinders: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => { 
 			const a = i * Math.PI * 2 / 8 + 0.123
 			const r = 3
-			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, material: 'shiny' }
+			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, is_capsule:0, material: 'shiny' }
 		}),
 		boxes: [
 		],
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 	})
 	
@@ -179,14 +288,32 @@ export const SCENES = [
 			// {center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
 		],
 		cylinders: [
-			// {center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
-			// {center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+			// {center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, is_capsule:0, material: 'shiny'},
+			// {center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, is_capsule:0, material: 'white'},
 		],
 		boxes: [
 		],
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 	})
 	
@@ -214,11 +341,29 @@ export const SCENES = [
 			{center: [0., -0.4, 0.], normal: [0., 1., 0.], material: 'table'},
 		],
 		cylinders: [
-			{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], material: 'pot'},
-			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
-			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
+			{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], is_capsule:0, material: 'pot'},
+			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], is_capsule:0, material: 'pen'},
+			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], is_capsule:0, material: 'metal'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	})
@@ -249,11 +394,29 @@ export const SCENES = [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
-			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], is_capsule:0, material: 'mirror'},
+			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], is_capsule:0, material: 'white'},
+			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], is_capsule:0, material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	})
@@ -288,10 +451,28 @@ export const SCENES = [
 	
 		],
 		cylinders: [
-			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], is_capsule:0, material: 'white'},
+			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], is_capsule:0, material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	})
@@ -335,17 +516,35 @@ export const SCENES = [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule:0, material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule:0, material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule:0, material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	})
 
 	SCENES.push({
-		name: 'Spheres+Cylinders',
+		name: 'Spheres - Cylinders - Capsules',
 		camera: {
 			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 		},
@@ -378,24 +577,48 @@ export const SCENES = [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], material: 'white'},
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 1, material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], is_capsule: 1,  material: 'white'},
 		],
 		boxes: [
+		],
+		triangles: [
+		],
+		links: [
+		],
+		cones: [
+		],
+		hexagonals: [
+		],
+		triangulars: [
+		],
+		solids: [
+		],
+		ellipsoids: [
+		],
+		octahedrons: [
+		],
+		pyramids: [
 		],
 		mesh: null,
 	})
 	
 	SCENES.push({
-		name: 'Box',
+		name: 'Box - Triangles - Box Frame - Cones - Hexagonal - Triangular - Ellipse - Pyramid - OctaHedron',
 		camera: {
-			position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+			position: [4.8, 13, 6.4], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 		},
 		materials: [
-			{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
-			{name: 'white', color: [0.9, 0.9, 0.9],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'floor', color: [0.7, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+			{name: 'white', color: [0.9, 0.8, 0.8],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'color1', color: [0.6, 0.2, 0.2],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'color2', color: [0.2, 0.6, 0.2],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'color3', color: [0.2, 0.2, 0.6],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'color4', color: [0.6, 0.2, 0.6],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+			{name: 'color5', color: [0.4, 0.5, 0.2],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
+			{name: 'color6', color: [0.7, 0.8, 0.6],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
 		],
 		lights: [
 			{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
@@ -404,17 +627,45 @@ export const SCENES = [
 		spheres: [
 		],
 		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+			{center: [0, 0, -2], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
 		],
 		boxes: [
-			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, material: 'white'},
-			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0,  material: 'white'},
-			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, material: 'white'},
-			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, material: 'white'},
-			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
-			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, is_frame:1, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0, is_frame:0, material: 'color1'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, is_frame:0, material: 'color4'},
+			{center: [0, -3, 0.4], length: 2, width: 3, height: 4, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, is_frame:0, material: 'white'},
+			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'color2'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.1, is_frame:1, material: 'color4'},
+		],
+		triangles: [
+			{vertice1: [4,3,3], vertice2: [4,3,3], vertice3: [4,3,3], material: 'color2'},
+			{vertice1: [5,2.4,1], vertice2: [4,3.1,1], vertice3: [3.5,2.4,2.5], material: 'color5'},
+		],
+		links: [
+			{center: [5,-2.3,1], length: 1, radius1: 0.2, radius2: 0.1, material:'color1'},
+		],
+		cones: [
+			{center: [-5,4,0.4], sin_cos: [5, 33], height:4, material:'color3'}
+		],
+		hexagonals: [
+			{center: [-10, -6, 0.15], heights: [1,1.5], material:'color3'}
+		],
+		triangulars: [
+			{center: [6.5, 1.2, 0.2], heights: [0.6,1], material:'color1'}
+		],
+		solids: [
+			//{center: [6.5, 4.2, 0.1], sin_cos: [0.15, 0.3], radius:1, material:'white'}
+		],
+		ellipsoids: [
+			{center: [6.5, 4.6, 0.1], radius: [0.85,0.2,0.7], material:'color6'}
+		],
+		octahedrons: [
+			{center: [-6.5, 4.6, 0.1], length: 1, material:'color6'}
+		],
+		pyramids: [
+			{center: [0.5, 6.2, 0.1], height: 1.3, material:'color6'}
 		],
 		mesh: null,
 	})
