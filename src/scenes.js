@@ -341,20 +341,16 @@ SCENES.push({
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
 	primitives: {
-		spheres: [
-		],
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
-		cylinders: [
-		],
 		boxes: [
-			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, material: 'white'},
-			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0,  material: 'white'},
-			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, material: 'white'},
-			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, material: 'white'},
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius: 0,  material: 'white'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0, material: 'white'},
+			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.2, material: 'white'},
 			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
-			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0.3, material: 'white'},
 		]
 	}
 });
@@ -383,6 +379,40 @@ SCENES.push({
 	}
 });
 
+SCENES.push({
+	name: 'Intersections',
+	camera: {
+		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+	},
+	materials: [
+		{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+		{name: 'white', color: [0.9, 0.9, 0.9],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+	],
+	lights: [
+		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
+	],
+	primitives: {
+		planes: [
+			{center: [0, 0, -3], normal: [0, 0, 1], material: 'floor'},
+		]
+	},
+	intersections: [
+		{	
+			material: 'white',
+			shapes: [
+				{type: 'box', center: [0, 2, 0.1], length: 2, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0},
+				{type: 'sphere', center: [1, 2, 0.1], radius: 0.8}
+			]
+		},
+		{	
+			material: 'white',
+			shapes: [
+				{type: 'sphere', center: [2.5, 2, 0.1], radius: 0.8},
+				{type: 'sphere', center: [2, 2, 0.1], radius: 0.8}
+			]
+		},
+	]
+});
 
 
 export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))

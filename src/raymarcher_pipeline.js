@@ -18,6 +18,12 @@ const mesh_quad_2d = {
 	],
 }
 
+const SPHERE_ID = 1;
+const PLANE_ID = 2;
+const CYLINDER_ID = 3;
+const BOX_ID = 4;
+const TORUS_ID = 5;
+
 export class Raymarcher {
 	constructor({resolution, scenes}) {
 		this.resolution = resolution
@@ -134,6 +140,72 @@ export class Raymarcher {
 		}
 	}
 
+	add_shape(shape, idx, shapes_collection, primitives_collection){
+		const {type, ...shape_properties} = shape;
+		if(type === 'sphere'){
+			shapes_collection[idx].push({shape_id: SPHERE_ID, shape_index: primitives_collection.spheres.length});
+			primitives_collection.spheres.push(shape_properties);
+		}
+		else if (type === 'box'){
+			shapes_collection[idx].push({shape_id: BOX_ID, shape_index: primitives_collection.boxes.length});
+			primitives_collection.boxes.push(shape_properties);
+		}
+	}
+
+	process_intersections(scene, uniforms, material_id_by_name, code_injections){
+
+		const intersection_shapes = [];
+		const intersection_primitives = {
+			planes: [],
+			spheres: [],
+			boxes: [],
+			cylinders: [],
+			toruses: []
+		};
+
+		if(scene.intersections){
+			const intersections = scene.intersections;
+
+			intersections.forEach((intersection, idx) => {
+				const shape1 = intersection.shapes[0];
+				const shape2 = intersection.shapes[1];
+				intersection_shapes[idx] = [];
+
+				this.add_shape(shape1, idx, intersection_shapes, intersection_primitives);
+				this.add_shape(shape2, idx, intersection_shapes, intersection_primitives);
+
+				intersection_shapes[idx].push({material_id: material_id_by_name[intersection.material]});
+			});
+
+			intersection_shapes.forEach((shapes, idx) => {
+				uniforms[`intersections[${idx}].shape1_id`] = shapes[0].shape_id
+				uniforms[`intersections[${idx}].shape1_index`] = shapes[0].shape_index
+				uniforms[`intersections[${idx}].shape2_id`] = shapes[1].shape_id
+				uniforms[`intersections[${idx}].shape2_index`] = shapes[1].shape_index
+				uniforms[`intersections[${idx}].material_id`] = shapes[2].material_id			
+			});			
+
+			intersection_primitives.spheres.forEach((sph, idx) => {
+				uniforms[`intersection_spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius);
+			});
+
+			intersection_primitives.boxes.forEach((box, idx) => {
+				uniforms[`intersection_boxes[${idx}].center`] = box.center;
+				uniforms[`intersection_boxes[${idx}].length`] = box.length;
+				uniforms[`intersection_boxes[${idx}].width`] = box.width;
+				uniforms[`intersection_boxes[${idx}].height`] = box.height;
+				uniforms[`intersection_boxes[${idx}].rotation_x`] = toRadian(box.rotation_x);
+				uniforms[`intersection_boxes[${idx}].rotation_y`] = toRadian(box.rotation_y);
+				uniforms[`intersection_boxes[${idx}].rotation_z`] = toRadian(box.rotation_z);
+				uniforms[`intersection_boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius;
+			});
+		}
+
+		code_injections['INTERSECTION_NUM_SPHERES'] = intersection_primitives.spheres.length.toFixed(0);
+		code_injections['INTERSECTION_NUM_BOXES'] = intersection_primitives.boxes.length.toFixed(0);
+		code_injections['NUM_INTERSECTIONS'] = intersection_shapes.length.toFixed(0);
+	}
+
 	ray_marcher_pipeline_for_scene(scene) {
 
 		const camera = scene.camera;
@@ -170,6 +242,7 @@ export class Raymarcher {
 		
 
 		this.process_primitives(scene, uniforms, material_id_by_name, code_injections);
+		this.process_intersections(scene, uniforms, material_id_by_name, code_injections);
 
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)

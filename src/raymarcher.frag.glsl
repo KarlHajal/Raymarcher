@@ -10,9 +10,33 @@ precision highp float;
 #define MAX_RANGE 1e6
 //#define NUM_REFLECTIONS
 
+const int SPHERE_ID = 1;
+const int PLANE_ID = 2;
+const int CYLINDER_ID = 3;
+const int BOX_ID = 4;
+const int TORUS_ID = 5;
+
+struct ShapesCombination {
+	int shape1_id;
+	int shape1_index;
+	int shape2_id;
+	int shape2_index;
+	int material_id;
+};
+
+//#define NUM_INTERSECTIONS
+#if NUM_INTERSECTIONS != 0
+uniform ShapesCombination intersections[NUM_INTERSECTIONS];
+#endif
+
+
 //#define NUM_SPHERES
 #if NUM_SPHERES != 0
 uniform vec4 spheres_center_radius[NUM_SPHERES]; // ...[i] = [center_x, center_y, center_z, radius]
+#endif
+//#define INTERSECTION_NUM_SPHERES
+#if INTERSECTION_NUM_SPHERES != 0
+uniform vec4 intersection_spheres_center_radius[INTERSECTION_NUM_SPHERES];
 #endif
 
 //#define NUM_PLANES
@@ -44,6 +68,10 @@ struct Box {
 };
 #if NUM_BOXES != 0
 uniform Box boxes[NUM_BOXES];
+#endif
+//#define INTERSECTION_NUM_BOXES
+#if INTERSECTION_NUM_BOXES != 0
+uniform Box intersection_boxes[INTERSECTION_NUM_BOXES];
 #endif
 
 //#define NUM_TORUSES
@@ -95,6 +123,28 @@ Material get_mat2(int mat_id) {
 	return m;
 }
 
+#if INTERSECTION_NUM_SPHERES != 0
+vec4 get_sphere(int sphere_index){
+	for(int i = 0; i < INTERSECTION_NUM_SPHERES; ++i){
+		if(i == sphere_index){
+			return intersection_spheres_center_radius[i];
+		}
+	}
+	return intersection_spheres_center_radius[0];
+}
+#endif
+
+#if INTERSECTION_NUM_BOXES != 0
+Box get_box(int box_index) {
+	for(int i = 0; i < INTERSECTION_NUM_BOXES; ++i){
+		if(i == box_index){
+			return intersection_boxes[i];
+		}
+	}
+	return intersection_boxes[0];
+}
+#endif
+
 mat4 rotation_x (float angle) {
 	return mat4(1.0, 0., 0., 0.,
 			 	0., cos(angle), -sin(angle), 0.,
@@ -117,12 +167,14 @@ mat4 rotation_z(float angle) {
 }
 
 
-
-float sphere_sdf(vec3 sample_point, vec3 sphere_center, float sphere_radius) {
-    return length(sphere_center - sample_point) - sphere_radius;
+float sphere_sdf(vec3 sample_point, vec4 sphere_center_radius) {
+    return length(sphere_center_radius.xyz - sample_point) - sphere_center_radius[3];
 }
 
-float plane_sdf(vec3 sample_point, vec3 plane_normal, vec3 point_on_plane) {
+float plane_sdf(vec3 sample_point, vec4 planes_normal_offset) {
+	vec3 plane_normal = planes_normal_offset.xyz;
+	float plane_offset = planes_normal_offset[3];
+	vec3 point_on_plane = plane_normal * plane_offset;
 	return abs(dot(sample_point - point_on_plane, plane_normal));
 }
 
@@ -163,11 +215,7 @@ float box_sdf(vec3 sample_point, Box box){
 void primitives_sdf(vec3 sample_point, out float min_distance, out int material_id){
 	#if NUM_SPHERES != 0
 	for(int i = 0; i < NUM_SPHERES; i++) {
-
-		vec3 sphere_center = spheres_center_radius[i].xyz;
-		float sphere_radius = spheres_center_radius[i][3];
-
-		float object_distance = sphere_sdf(sample_point, sphere_center, sphere_radius);
+		float object_distance = sphere_sdf(sample_point, spheres_center_radius[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
@@ -179,12 +227,7 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 
 	#if NUM_PLANES != 0 
 	for(int i = 0; i < NUM_PLANES; i++) {
-
-		vec3 plane_normal = planes_normal_offset[i].xyz;
-		float plane_offset = planes_normal_offset[i][3];
-		vec3 point_on_plane = plane_normal * plane_offset;
-	
-		float object_distance = plane_sdf(sample_point, plane_normal, point_on_plane);
+		float object_distance = plane_sdf(sample_point, planes_normal_offset[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
@@ -232,11 +275,47 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 	#endif
 }
 
+float shape_sdf(vec3 sample_point, int shape_id, int shape_index){
+
+	#if INTERSECTION_NUM_SPHERES != 0
+	if(shape_id == SPHERE_ID){
+		return sphere_sdf(sample_point, get_sphere(shape_index));
+	}
+	#endif
+	
+	#if INTERSECTION_NUM_BOXES != 0
+	if (shape_id == BOX_ID){
+		return box_sdf(sample_point, get_box(shape_index));
+	}
+	#endif
+
+	return MAX_RANGE;
+}
+
+void intersections_sdf(vec3 sample_point, out float min_distance, out int material_id){
+	#if NUM_INTERSECTIONS != 0
+	for(int i = 0; i < NUM_INTERSECTIONS; ++i) {
+		ShapesCombination intersection = intersections[i];
+
+		float shape1_distance = shape_sdf(sample_point, intersection.shape1_id, intersection.shape1_index);
+		float shape2_distance = shape_sdf(sample_point, intersection.shape2_id, intersection.shape2_index);
+
+		float object_distance = max(shape1_distance, shape2_distance);
+
+		if(object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id = intersection.material_id;
+		}
+	}
+	#endif
+}
+
 float scene_sdf(vec3 sample_point, out int material_id) {
 
 	float min_distance = MAX_RANGE;
 
 	primitives_sdf(sample_point, min_distance, material_id);
+	intersections_sdf(sample_point, min_distance, material_id);
 
     return min_distance;
 }
