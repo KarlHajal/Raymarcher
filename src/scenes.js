@@ -17,37 +17,21 @@ SCENES.push({
 		{position: [3., 0, -0.5], color: [1.0, 0.4, 0.2]},
 		{position: [-3., -0.8, 3], color: [0.2, 0.4, 0.9]},
 	],
-	spheres: [
-		{center: [0.0, 0.0, 2.0], radius: 1.0, material: 'white'},
-		{center: [0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
-		{center: [-0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
-		{center: [0., -0.1, 1.0], radius: 0.2, material: 'black'},
-	],
-	planes: [
-		{center: [0.0, 1., 0.], normal: [0., -1., 0.], material: 'white'}, // top
-		{center: [0.0, -1., 0.], normal: [0., 1., 0.], material: 'mirror'}, // bottom
-	],
-	cylinders: [
-		{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], material: 'green'},
-	],
-});
-
-SCENES.push({
-	name: "corner",
-	camera: {
-		position: [0, 0.5, 0], target: [0, 0.5, 1], up: [0, 1, 0], fov: 75,
-	},
-	materials: [
-		{name: 'green', color: [0.3, 1., 0.4], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.},
-	],
-	lights: [
-		{position: [0., 0., 0.1], color: [1.0, 0.4, 0.2]},
-	],
-	planes: [
-		{center: [0.0, 0., 1.], normal: [0., 0., 1.], material: 'green'},
-		{center: [0.0, 0., 0.], normal: [0., 1., 0.], material: 'green'},
-		{center: [-0.3, 0., 0.], normal: [1., 0., 0.], material: 'green'},
-	]
+	primitives:{
+		spheres: [
+			{center: [0.0, 0.0, 2.0], radius: 1.0, material: 'white'},
+			{center: [0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
+			{center: [-0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
+			{center: [0., -0.1, 1.0], radius: 0.2, material: 'black'},
+		],
+		planes: [
+			{center: [0.0, 1., 0.], normal: [0., -1., 0.], material: 'white'}, // top
+			{center: [0.0, -1., 0.], normal: [0., 1., 0.], material: 'mirror'}, // bottom
+		],
+		cylinders: [
+			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], material: 'green'},
+		]
+	}
 });
 
 SCENES.push({
@@ -63,11 +47,13 @@ SCENES.push({
 		{position: [50, 50, 50], color: [0.2, 0.4, 0.9]},
 		{position: [-50, 50, 50], color: [0.2, 0.8, 0.2]},
 	],
-	cylinders: [
-		{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], material: 'white'},
-		{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
-		{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
-	]
+	primitives: {
+		cylinders: [
+			{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], material: 'white'},
+			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
+			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
+		]
+	}
 });
 	
 SCENES.push({
@@ -83,18 +69,20 @@ SCENES.push({
 		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 2., mirror: 0.0},
 		{name: 'shiny', color: [0.9, 0.3, 0.1], ambient: 0.1, diffuse: 0.3, specular: 0.9, shininess: 10., mirror: 0.2},
 	],
-	spheres: [
-		{center: [2, 0, 0.1], radius: 0.6, material: 'white'},
-		{center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
-	],
-	cylinders: [
-		{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
-		{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
-	],
-	planes: [
-		{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	],
+	primitives: {
+		spheres: [
+			{center: [2, 0, 0.1], radius: 0.6, material: 'white'},
+			{center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
+		],
+		cylinders: [
+			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
+			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+		],
+		planes: [
+			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		]
+	}
 })
 
 SCENES.push({
@@ -111,14 +99,16 @@ SCENES.push({
 		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 2., mirror: 0.0},
 		{name: 'shiny', color: [0.9, 0.3, 0.1], ambient: 0.1, diffuse: 0.3, specular: 0.9, shininess: 10., mirror: 0.2},
 	],
-	cylinders: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => { 
-		const a = i * Math.PI * 2 / 8 + 0.123
-		const r = 3
-		return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, material: 'shiny' }
-	}),
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	]
+	primitives: {
+		cylinders: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => { 
+			const a = i * Math.PI * 2 / 8 + 0.123
+			const r = 3
+			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, material: 'shiny' }
+		}),
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		]
+	}
 })
 
 SCENES.push({
@@ -135,13 +125,15 @@ SCENES.push({
 		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 2., mirror: 0.0},
 		{name: 'shiny', color: [0.9, 0.3, 0.1], ambient: 0.1, diffuse: 0.3, specular: 0.9, shininess: 10., mirror: 0.2},
 	],
-	spheres: [
-		{center: [0, 0, 0], radius: 1, material: 'white'},
-	],
-	planes: [
-		{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	]
+	primitives: {
+		spheres: [
+			{center: [0, 0, 0], radius: 1, material: 'white'},
+		],
+		planes: [
+			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		]
+	}
 })
 
 SCENES.push({
@@ -160,18 +152,20 @@ SCENES.push({
 	lights: [
 		{position: [0.3, 0.35, -0.15], color: [0.9, 0.8, 0.7]},
 	],
-	spheres: [
-		{center: [-0.588, 0.096, 0.324], radius: 0.01, material: 'rubber'},
-	],
-	planes: [
-		{center: [0., 0., 1.5], normal: [0., 0., 1.], material: 'wall'},
-		{center: [0., -0.4, 0.], normal: [0., 1., 0.], material: 'table'},
-	],
-	cylinders: [
-		{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], material: 'pot'},
-		{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
-		{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
-	]
+	primitives: {
+		spheres: [
+			{center: [-0.588, 0.096, 0.324], radius: 0.01, material: 'rubber'},
+		],
+		planes: [
+			{center: [0., 0., 1.5], normal: [0., 0., 1.], material: 'wall'},
+			{center: [0., -0.4, 0.], normal: [0., 1., 0.], material: 'table'},
+		],
+		cylinders: [
+			{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], material: 'pot'},
+			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
+			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
+		]
+	}
 });
 
 SCENES.push({
@@ -191,19 +185,21 @@ SCENES.push({
 		{position: [2.5, 2.5, 4], color: [1.0, 0.8, 0.5]},
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
-	spheres: [
-		{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
-		{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
-		{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
-	],
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	],
-	cylinders: [
-		{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
-		{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-		{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
-	]
+	primitives:{
+		spheres: [
+			{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
+			{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
+			{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
+			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
+			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+		]
+	}
 });
 
 SCENES.push({
@@ -222,21 +218,23 @@ SCENES.push({
 		{position: [2.5, 2.5, 4], color: [1.0, 0.8, 0.5]},
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
-	spheres: [
-		{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
-		{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
-		{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
-	],
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		{center: [-5, 5, 0], normal: [-2, 1, 0], material: 'mirror'},
-		{center: [ 5, 5, 0], normal: [1.5, 1, 0], material: 'mirror'},
+	primitives: {
+		spheres: [
+			{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
+			{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
+			{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+			{center: [-5, 5, 0], normal: [-2, 1, 0], material: 'mirror'},
+			{center: [ 5, 5, 0], normal: [1.5, 1, 0], material: 'mirror'},
 
-	],
-	cylinders: [
-		{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-		{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
-	]
+		],
+		cylinders: [
+			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
+			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+		]
+	}
 });
 
 SCENES.push({
@@ -253,35 +251,37 @@ SCENES.push({
 		{position: [1, 3, 10], color: [1.0, 1.0, 1.0]},
 		//{position: [-10, 0, 10], color: [1.0, 1.0, 1.0]},
 	],
-	spheres: [
-		{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
-		//{center: [-3, 0, 1.1], radius: 1.5, material: 'green'},
-		//{center: [-3, 0, 3.], radius: 1., material: 'green'},
-		//{center: [-2.5, 1, 3.5], radius: 0.2, material: 'white'},
-		//{center: [-3.1, 1, 3.5], radius: 0.2, material: 'white'},
-		//{center: [-2.8, 1, 3.2], radius: 0.1, material: 'white'},
-	],
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	],
-	cylinders: [
-		{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-		{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-		{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-	]
+	primitives: {
+		spheres: [
+			{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
+			//{center: [-3, 0, 1.1], radius: 1.5, material: 'green'},
+			//{center: [-3, 0, 3.], radius: 1., material: 'green'},
+			//{center: [-2.5, 1, 3.5], radius: 0.2, material: 'white'},
+			//{center: [-3.1, 1, 3.5], radius: 0.2, material: 'white'},
+			//{center: [-2.8, 1, 3.2], radius: 0.1, material: 'white'},
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+		]
+	}
 });
 
 SCENES.push({
@@ -298,31 +298,33 @@ SCENES.push({
 		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
-	spheres: [
-		{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
-		{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
-		{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-		{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
-	],
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	],
-	cylinders: [
-		{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-		{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-		{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-		{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], material: 'white'},
-	]
+	primitives: {
+		spheres: [
+			{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
+			{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
+			{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
+			{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], material: 'white'},
+		]
+	}
 });
 
 SCENES.push({
@@ -338,21 +340,23 @@ SCENES.push({
 		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
-	spheres: [
-	],
-	planes: [
-		{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-	],
-	cylinders: [
-	],
-	boxes: [
-		{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, material: 'white'},
-		{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0,  material: 'white'},
-		{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, material: 'white'},
-		{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, material: 'white'},
-		{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
-		{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
-	]
+	primitives: {
+		spheres: [
+		],
+		planes: [
+			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+		],
+		cylinders: [
+		],
+		boxes: [
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0,  material: 'white'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, material: 'white'},
+			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, material: 'white'},
+			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
+		]
+	}
 });
 
 SCENES.push({
@@ -367,14 +371,16 @@ SCENES.push({
 	lights: [
 		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
 	],
-	planes: [
-		{center: [0, 0, -3], normal: [0, 0, 1], material: 'floor'},
-	],
-	toruses: [
-		{center: [1,0,0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'white'},
-		{center: [4,3,0],  radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : 45 , material : 'white'},
-		{center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45, material : 'white'},
-	]
+	primitives: {
+		planes: [
+			{center: [0, 0, -3], normal: [0, 0, 1], material: 'floor'},
+		],
+		toruses: [
+			{center: [1,0,0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'white'},
+			{center: [4,3,0],  radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : 45 , material : 'white'},
+			{center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45, material : 'white'},
+		]
+	}
 });
 
 

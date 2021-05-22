@@ -54,6 +54,86 @@ export class Raymarcher {
 		}
 	}
 
+	process_primitives(scene, uniforms, material_id_by_name, code_injections){
+		
+		if(scene.primitives){
+			const primitives = scene.primitives;
+			const object_material_id = [];
+
+			function next_object_material(mat_name) {
+				object_material_id.push(material_id_by_name[mat_name]);
+			}
+
+			const spheres = primitives.spheres ? primitives.spheres : [];
+			spheres.forEach((sph, idx) => {
+				uniforms[`spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius)
+				
+				next_object_material(sph.material)
+			})
+			code_injections['NUM_SPHERES'] = spheres.length.toFixed(0)
+
+
+			const planes = primitives.planes ? primitives.planes : [];
+			planes.forEach((pl, idx) => {
+				const pl_norm = [0., 0., 0.]
+				vec3.normalize(pl_norm, pl.normal)
+				const pl_offset = vec3.dot(pl_norm, pl.center)
+				uniforms[`planes_normal_offset[${idx}]`] = pl_norm.concat(pl_offset)
+				
+				next_object_material(pl.material)
+			})
+			code_injections['NUM_PLANES'] = planes.length.toFixed(0)
+
+
+			const cylinders = primitives.cylinders ? primitives.cylinders : [];
+			cylinders.forEach((cyl, idx) => {
+				uniforms[`cylinders[${idx}].center`] = cyl.center
+				uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
+				uniforms[`cylinders[${idx}].radius`] = cyl.radius
+				uniforms[`cylinders[${idx}].height`] = cyl.height
+				
+				next_object_material(cyl.material)
+			})
+			code_injections['NUM_CYLINDERS'] = cylinders.length.toFixed(0)
+			
+
+			const boxes = primitives.boxes ? primitives.boxes : [];
+			boxes.forEach((box, idx) => {
+				uniforms[`boxes[${idx}].center`] = box.center
+				uniforms[`boxes[${idx}].length`] = box.length
+				uniforms[`boxes[${idx}].width`] = box.width
+				uniforms[`boxes[${idx}].height`] = box.height
+				uniforms[`boxes[${idx}].rotation_x`] = toRadian(box.rotation_x)
+				uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
+				uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
+				uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
+
+				next_object_material(box.material)
+			})
+			code_injections['NUM_BOXES'] = boxes.length.toFixed(0);
+			
+			
+			const toruses = primitives.toruses ? primitives.toruses : [];
+			toruses.forEach((torus, idx) => {
+				uniforms[`toruses[${idx}].center`] = torus.center
+				uniforms[`toruses[${idx}].radi`  ] = torus.radi
+				uniforms[`toruses[${idx}].rotation_x`] = toRadian(torus.rotation_x)
+				uniforms[`toruses[${idx}].rotation_y`] = toRadian(torus.rotation_y)
+				uniforms[`toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
+				
+				next_object_material(torus.material)
+			})
+			code_injections['NUM_TORUSES'] = toruses.length.toFixed(0);
+
+			// regl 2.1.0 loads a uniform array all at once
+			if(object_material_id.length > 1) {
+				uniforms['object_material_id'] = object_material_id
+			} else if (object_material_id.length == 1) {
+				uniforms['object_material_id[0]'] = object_material_id[0]
+			}
+		}
+	}
+
 	ray_marcher_pipeline_for_scene(scene) {
 
 		const camera = scene.camera;
@@ -89,82 +169,8 @@ export class Raymarcher {
 		code_injections['NUM_LIGHTS'] = lights.length.toFixed(0)
 		
 
-		const object_material_id = []
-		let num_objects = 0;
+		this.process_primitives(scene, uniforms, material_id_by_name, code_injections);
 
-		function next_object_material(mat_name) {
-			object_material_id[num_objects] = material_id_by_name[mat_name]
-			num_objects += 1
-		}
-
-		const spheres = scene.spheres? scene.spheres : [];
-		spheres.forEach((sph, idx) => {
-			uniforms[`spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius)
-			
-			next_object_material(sph.material)
-		})
-		code_injections['NUM_SPHERES'] = spheres.length.toFixed(0)
-
-
-		const planes = scene.planes ? scene.planes : [];
-		planes.forEach((pl, idx) => {
-			const pl_norm = [0., 0., 0.]
-			vec3.normalize(pl_norm, pl.normal)
-			const pl_offset = vec3.dot(pl_norm, pl.center)
-			uniforms[`planes_normal_offset[${idx}]`] = pl_norm.concat(pl_offset)
-			
-			next_object_material(pl.material)
-		})
-		code_injections['NUM_PLANES'] = planes.length.toFixed(0)
-
-
-		const cylinders = scene.cylinders ? scene.cylinders : [];
-		cylinders.forEach((cyl, idx) => {
-			uniforms[`cylinders[${idx}].center`] = cyl.center
-			uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
-			uniforms[`cylinders[${idx}].radius`] = cyl.radius
-			uniforms[`cylinders[${idx}].height`] = cyl.height
-			
-			next_object_material(cyl.material)
-		})
-		code_injections['NUM_CYLINDERS'] = cylinders.length.toFixed(0)
-		
-
-		const boxes = scene.boxes ? scene.boxes : [];
-		boxes.forEach((box, idx) => {
-			uniforms[`boxes[${idx}].center`] = box.center
-			uniforms[`boxes[${idx}].length`] = box.length
-			uniforms[`boxes[${idx}].width`] = box.width
-			uniforms[`boxes[${idx}].height`] = box.height
-			uniforms[`boxes[${idx}].rotation_x`] = toRadian(box.rotation_x)
-			uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
-			uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
-			uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
-
-			next_object_material(box.material)
-		})
-		code_injections['NUM_BOXES'] = boxes.length.toFixed(0)
-		
-		
-		const toruses = scene.toruses ? scene.toruses : [];
-		toruses.forEach((torus, idx) => {
-			uniforms[`toruses[${idx}].center`] = torus.center
-			uniforms[`toruses[${idx}].radi`  ] = torus.radi
-			uniforms[`toruses[${idx}].rotation_x`] = toRadian(torus.rotation_x)
-			uniforms[`toruses[${idx}].rotation_y`] = toRadian(torus.rotation_y)
-			uniforms[`toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
-			
-			next_object_material(torus.material)
-		})
-		code_injections['NUM_TORUSES'] = toruses.length.toFixed(0)
-		
-		
-		// regl 2.1.0 loads a uniform array all at once
-		if(object_material_id.length > 1) {
-			uniforms['object_material_id'] = object_material_id
-		} else if (object_material_id.length == 1) {
-			uniforms['object_material_id[0]'] = object_material_id[0]
-		}
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		
