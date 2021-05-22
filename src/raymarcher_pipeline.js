@@ -55,8 +55,8 @@ export class Raymarcher {
 	}
 
 	ray_marcher_pipeline_for_scene(scene) {
-		const {name, camera, materials, lights, spheres, planes, cylinders, boxes, toruses} = scene
 
+		const camera = scene.camera;
 		const uniforms = {}
 		Object.assign(uniforms, this.gen_uniforms_camera(camera))
 		uniforms['light_color_ambient'] = [1.0, 1.0, 1.0]
@@ -68,6 +68,7 @@ export class Raymarcher {
 
 		const material_id_by_name = {}
 
+		const materials = scene.materials ? scene.materials : [];
 		materials.forEach((mat, idx) => {
 			material_id_by_name[mat.name] = idx
 			uniforms[`materials[${idx}].color`] = mat.color
@@ -80,6 +81,7 @@ export class Raymarcher {
 		code_injections['NUM_MATERIALS'] = materials.length.toFixed(0)
 
 
+		const lights = scene.lights ? scene.lights : [];
 		lights.forEach((li, idx) => {
 			uniforms[`lights[${idx}].position`] = li.position
 			uniforms[`lights[${idx}].color`] = li.color
@@ -95,7 +97,7 @@ export class Raymarcher {
 			num_objects += 1
 		}
 
-
+		const spheres = scene.spheres? scene.spheres : [];
 		spheres.forEach((sph, idx) => {
 			uniforms[`spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius)
 			
@@ -104,6 +106,7 @@ export class Raymarcher {
 		code_injections['NUM_SPHERES'] = spheres.length.toFixed(0)
 
 
+		const planes = scene.planes ? scene.planes : [];
 		planes.forEach((pl, idx) => {
 			const pl_norm = [0., 0., 0.]
 			vec3.normalize(pl_norm, pl.normal)
@@ -115,6 +118,7 @@ export class Raymarcher {
 		code_injections['NUM_PLANES'] = planes.length.toFixed(0)
 
 
+		const cylinders = scene.cylinders ? scene.cylinders : [];
 		cylinders.forEach((cyl, idx) => {
 			uniforms[`cylinders[${idx}].center`] = cyl.center
 			uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
@@ -126,6 +130,7 @@ export class Raymarcher {
 		code_injections['NUM_CYLINDERS'] = cylinders.length.toFixed(0)
 		
 
+		const boxes = scene.boxes ? scene.boxes : [];
 		boxes.forEach((box, idx) => {
 			uniforms[`boxes[${idx}].center`] = box.center
 			uniforms[`boxes[${idx}].length`] = box.length
@@ -141,6 +146,7 @@ export class Raymarcher {
 		code_injections['NUM_BOXES'] = boxes.length.toFixed(0)
 		
 		
+		const toruses = scene.toruses ? scene.toruses : [];
 		toruses.forEach((torus, idx) => {
 			uniforms[`toruses[${idx}].center`] = torus.center
 			uniforms[`toruses[${idx}].radi`  ] = torus.radi
