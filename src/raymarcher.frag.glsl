@@ -153,8 +153,6 @@ float torus_sdf(vec3 sample_point, Torus torus) {
 	return length(q) - torus.radi.y;
 }
 
-
-
 float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
@@ -162,10 +160,7 @@ float box_sdf(vec3 sample_point, Box box){
   	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
 }
 
-float scene_sdf(vec3 sample_point, out int material_id) {
-
-	float min_distance = MAX_RANGE;
-
+void primitives_sdf(vec3 sample_point, out float min_distance, out int material_id){
 	#if NUM_SPHERES != 0
 	for(int i = 0; i < NUM_SPHERES; i++) {
 
@@ -235,6 +230,13 @@ float scene_sdf(vec3 sample_point, out int material_id) {
 		}
 	}
 	#endif
+}
+
+float scene_sdf(vec3 sample_point, out int material_id) {
+
+	float min_distance = MAX_RANGE;
+
+	primitives_sdf(sample_point, min_distance, material_id);
 
     return min_distance;
 }
