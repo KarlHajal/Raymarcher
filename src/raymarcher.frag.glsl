@@ -58,22 +58,6 @@ struct Torus {
 uniform Torus toruses[NUM_TORUSES];
 #endif
 
-
-
-//#define NUM_TRIANGLES
-struct Triangle {
-	mat3 vertices;
-// 	mat3 normals;
-};
-struct AABB {
-	vec3 corner_min;
-	vec3 corner_max;
-};
-#if NUM_TRIANGLES != 0
-uniform Triangle triangles[NUM_TRIANGLES];
-uniform AABB mesh_extent;
-#endif
-
 // materials
 //#define NUM_MATERIALS
 struct Material {
@@ -178,7 +162,7 @@ float box_sdf(vec3 sample_point, Box box){
   	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
 }
 
-float sceneSDF(vec3 sample_point, out int material_id) {
+float scene_sdf(vec3 sample_point, out int material_id) {
 
 	float min_distance = MAX_RANGE;
 
@@ -260,10 +244,10 @@ vec3 estimate_normal(vec3 p ) // Tetrahedron technique
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1);
 	int temp_id;
-    return normalize( k.xyy*sceneSDF( p + k.xyy*h, temp_id ) + 
-                      k.yyx*sceneSDF( p + k.yyx*h, temp_id ) + 
-                      k.yxy*sceneSDF( p + k.yxy*h, temp_id ) + 
-                      k.xxx*sceneSDF( p + k.xxx*h, temp_id ) );
+    return normalize( k.xyy*scene_sdf( p + k.xyy*h, temp_id ) + 
+                      k.yyx*scene_sdf( p + k.yyx*h, temp_id ) + 
+                      k.yxy*scene_sdf( p + k.yxy*h, temp_id ) + 
+                      k.xxx*scene_sdf( p + k.xxx*h, temp_id ) );
 }
 
 
@@ -271,7 +255,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     float depth = start;
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
 
-        float dist = sceneSDF(ray_origin + depth * marching_direction, material_id);
+        float dist = scene_sdf(ray_origin + depth * marching_direction, material_id);
         
 		if (dist < EPSILON) {
 			return depth;

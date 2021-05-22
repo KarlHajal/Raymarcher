@@ -32,8 +32,7 @@ export const SCENES = [
 		boxes: [
 		],
 		toruses: [
-		],
-		mesh: null,
+		]
 	},
 	{
 		name: "corner",
@@ -55,8 +54,7 @@ export const SCENES = [
 		boxes: [
 		],
 		cylinders: [],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	},
 	{
 		name: "barrel",
@@ -78,8 +76,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	},
 	{
 		name: "cylinders",
@@ -103,8 +100,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	}
 	]
 	
@@ -163,8 +159,7 @@ export const SCENES = [
 		],
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		],
-		toruses: [],
+		]
 	})
 	
 	SCENES.push({
@@ -195,7 +190,8 @@ export const SCENES = [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
-		toruses: [],
+		toruses: [
+		],
 	})
 	
 	SCENES.push({
@@ -228,8 +224,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	})
 	
 	SCENES.push({
@@ -264,8 +259,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	})
 	
 	
@@ -303,8 +297,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	})
 
 	SCENES.push({
@@ -352,8 +345,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	})
 
 	SCENES.push({
@@ -397,8 +389,7 @@ export const SCENES = [
 		],
 		boxes: [
 		],
-		toruses: [],
-		mesh: null,
+		toruses: []
 	})
 	
 	SCENES.push({
@@ -430,8 +421,7 @@ export const SCENES = [
 			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.3, material: 'white'},
 		],
 		toruses: [
-		],
-		mesh: null,
+		]
 	})
 	
 	SCENES.push({
@@ -459,8 +449,7 @@ export const SCENES = [
 			{center: [1,0,0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'white'},
 			{center: [4,3,0],  radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : 45 , material : 'white'},
 			{center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45, material : 'white'},
-		],
-		mesh: null,
+		]
 	})
 	
 	
