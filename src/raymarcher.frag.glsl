@@ -2,6 +2,12 @@ precision highp float;
 
 #define PI 3.14159265359
 
+const int SPHERE_ID = 1;
+const int PLANE_ID = 2;
+const int CYLINDER_ID = 3;
+const int BOX_ID = 4;
+const int TORUS_ID = 5;
+
 #define NUM_AMBIENT_OCCLUSION_SAMPLES 32
 #define MAX_MARCHING_STEPS 255
 #define MIN_DISTANCE 0.0
@@ -9,6 +15,16 @@ precision highp float;
 #define EPSILON 0.001
 #define MAX_RANGE 1e6
 //#define NUM_REFLECTIONS
+
+//#define NUM_SHAPES
+struct Shape {
+	int shape_id;
+	int shape_index;
+	int material_id;
+};
+#if NUM_SHAPES != 0
+uniform Shape shapes[NUM_SHAPES];
+#endif
 
 //#define NUM_SPHERES
 #if NUM_SPHERES != 0
@@ -58,22 +74,6 @@ struct Torus {
 uniform Torus toruses[NUM_TORUSES];
 #endif
 
-
-
-//#define NUM_TRIANGLES
-struct Triangle {
-	mat3 vertices;
-// 	mat3 normals;
-};
-struct AABB {
-	vec3 corner_min;
-	vec3 corner_max;
-};
-#if NUM_TRIANGLES != 0
-uniform Triangle triangles[NUM_TRIANGLES];
-uniform AABB mesh_extent;
-#endif
-
 // materials
 //#define NUM_MATERIALS
 struct Material {
@@ -85,9 +85,7 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0) || (NUM_TORUSES != 0)
-uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES];
-#endif
+
 //#define NUM_LIGHTS
 struct Light {
 	vec3 color;
@@ -111,6 +109,61 @@ Material get_mat2(int mat_id) {
 	return m;
 }
 
+#if NUM_SPHERES != 0
+vec4 get_sphere(int sphere_index){
+	for(int i = 0; i < NUM_SPHERES; ++i){
+		if(i == sphere_index){
+			return spheres_center_radius[i];
+		}
+	}
+	return spheres_center_radius[0];
+}
+#endif
+
+#if NUM_PLANES != 0
+vec4 get_plane(int plane_index){
+	for(int i = 0; i < NUM_PLANES; ++i){
+		if(i == plane_index){
+			return planes_normal_offset[i];
+		}
+	}
+	return planes_normal_offset[0];
+}
+#endif
+
+#if NUM_CYLINDERS != 0
+Cylinder get_cylinder(int cylinder_index) {
+	for(int i = 0; i < NUM_CYLINDERS; ++i){
+		if(i == cylinder_index){
+			return cylinders[i];
+		}
+	}
+	return cylinders[0];
+}
+#endif
+
+#if NUM_BOXES != 0
+Box get_box(int box_index) {
+	for(int i = 0; i < NUM_BOXES; ++i){
+		if(i == box_index){
+			return boxes[i];
+		}
+	}
+	return boxes[0];
+}
+#endif
+
+#if NUM_TORUSES != 0
+Torus get_torus(int torus_index) {
+	for(int i = 0; i < NUM_TORUSES; ++i){
+		if(i == torus_index){
+			return toruses[i];
+		}
+	}
+	return toruses[0];
+}
+#endif
+
 mat4 rotation_x (float angle) {
 	return mat4(1.0, 0., 0., 0.,
 			 	0., cos(angle), -sin(angle), 0.,
@@ -133,12 +186,14 @@ mat4 rotation_z(float angle) {
 }
 
 
-
-float sphere_sdf(vec3 sample_point, vec3 sphere_center, float sphere_radius) {
-    return length(sphere_center - sample_point) - sphere_radius;
+float sphere_sdf(vec3 sample_point, vec4 sphere_center_radius) {
+    return length(sphere_center_radius.xyz - sample_point) - sphere_center_radius[3];
 }
 
-float plane_sdf(vec3 sample_point, vec3 plane_normal, vec3 point_on_plane) {
+float plane_sdf(vec3 sample_point, vec4 plane_normal_offset) {
+	vec3 plane_normal = plane_normal_offset.xyz;
+	float plane_offset = plane_normal_offset[3];
+	vec3 point_on_plane = plane_normal * plane_offset;
 	return abs(dot(sample_point - point_on_plane, plane_normal));
 }
 
@@ -169,8 +224,6 @@ float torus_sdf(vec3 sample_point, Torus torus) {
 	return length(q) - torus.radi.y;
 }
 
-
-
 float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
@@ -178,76 +231,56 @@ float box_sdf(vec3 sample_point, Box box){
   	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
 }
 
-float sceneSDF(vec3 sample_point, out int material_id) {
+float shape_sdf(vec3 sample_point, Shape shape){
 
-	float min_distance = MAX_RANGE;
+	int shape_id = shape.shape_id;
 
 	#if NUM_SPHERES != 0
-	for(int i = 0; i < NUM_SPHERES; i++) {
-
-		vec3 sphere_center = spheres_center_radius[i].xyz;
-		float sphere_radius = spheres_center_radius[i][3];
-
-		float object_distance = sphere_sdf(sample_point, sphere_center, sphere_radius);
-
-		if (object_distance < min_distance) {
-			min_distance = object_distance;
-			material_id =  object_material_id[i];
-		}
+	if(shape_id == SPHERE_ID){
+		return sphere_sdf(sample_point, get_sphere(shape.shape_index));
 	}
 	#endif
 
-
-	#if NUM_PLANES != 0 
-	for(int i = 0; i < NUM_PLANES; i++) {
-
-		vec3 plane_normal = planes_normal_offset[i].xyz;
-		float plane_offset = planes_normal_offset[i][3];
-		vec3 point_on_plane = plane_normal * plane_offset;
+	#if NUM_PLANES != 0
+	if (shape_id == PLANE_ID){	
+		return plane_sdf(sample_point, get_plane(shape.shape_index));
+	} 
+	#endif
 	
-		float object_distance = plane_sdf(sample_point, plane_normal, point_on_plane);
-
-		if (object_distance < min_distance) {
-			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES+i];
-		}
+	#if NUM_CYLINDERS != 0
+	if (shape_id == CYLINDER_ID){
+		return capped_cylinder_sdf(sample_point, get_cylinder(shape.shape_index));
 	}
 	#endif
-
-
-	#if NUM_CYLINDERS != 0 
-	for(int i = 0; i < NUM_CYLINDERS; i++) {
-		Cylinder cylinder = cylinders[i];
-		float object_distance = capped_cylinder_sdf(sample_point, cylinder);
-
-		if (object_distance < min_distance) {
-			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + i];
-		}
-	}
-	#endif
-
-
+	
 	#if NUM_BOXES != 0
-	for(int i = 0; i < NUM_BOXES; ++i) {
-		Box box = boxes[i];
-		float object_distance = box_sdf(sample_point, box);
-
-		if(object_distance < min_distance) {
-			min_distance = object_distance;
-			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + i];
-		}
+	if (shape_id == BOX_ID){
+		return box_sdf(sample_point, get_box(shape.shape_index));
 	}
 	#endif
 	
 	#if NUM_TORUSES != 0
-	for(int i = 0; i < NUM_TORUSES; ++i) {
-		Torus torus = toruses[i];
-		float object_distance = torus_sdf(sample_point, torus);
+	if (shape_id == TORUS_ID){
+		return torus_sdf(sample_point, get_torus(shape.shape_index));
+	}
+	#endif
+
+	return MAX_RANGE;
+}
+
+float scene_sdf(vec3 sample_point, out int material_id) {
+
+	float min_distance = MAX_RANGE;
+
+	#if NUM_SHAPES != 0
+	for(int i = 0; i < NUM_SHAPES; ++i) {
+		Shape shape = shapes[i];
+
+		float object_distance = shape_sdf(sample_point, shape);
 
 		if(object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id = object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + i];
+			material_id = shape.material_id;
 		}
 	}
 	#endif
@@ -260,10 +293,10 @@ vec3 estimate_normal(vec3 p ) // Tetrahedron technique
     const float h = 0.0001; // replace by an appropriate value
     const vec2 k = vec2(1,-1);
 	int temp_id;
-    return normalize( k.xyy*sceneSDF( p + k.xyy*h, temp_id ) + 
-                      k.yyx*sceneSDF( p + k.yyx*h, temp_id ) + 
-                      k.yxy*sceneSDF( p + k.yxy*h, temp_id ) + 
-                      k.xxx*sceneSDF( p + k.xxx*h, temp_id ) );
+    return normalize( k.xyy*scene_sdf( p + k.xyy*h, temp_id ) + 
+                      k.yyx*scene_sdf( p + k.yyx*h, temp_id ) + 
+                      k.yxy*scene_sdf( p + k.yxy*h, temp_id ) + 
+                      k.xxx*scene_sdf( p + k.xxx*h, temp_id ) );
 }
 
 
@@ -271,7 +304,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     float depth = start;
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
 
-        float dist = sceneSDF(ray_origin + depth * marching_direction, material_id);
+        float dist = scene_sdf(ray_origin + depth * marching_direction, material_id);
         
 		if (dist < EPSILON) {
 			return depth;

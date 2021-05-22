@@ -1,7 +1,6 @@
 
 import {load_text} from "./icg_web.js"
 import {framebuffer_to_image_download} from "./icg_screenshot.js"
-import {load_mesh_obj} from "./icg_mesh.js"
 import * as vec3 from "../lib/gl-matrix_3.3.0/esm/vec3.js"
 import { toRadian } from "../lib/gl-matrix_3.3.0/esm/common.js"
 
@@ -18,6 +17,12 @@ const mesh_quad_2d = {
 		[0, 2, 3], // bottom left
 	],
 }
+
+const SPHERE_ID = 1;
+const PLANE_ID = 2;
+const CYLINDER_ID = 3;
+const BOX_ID = 4;
+const TORUS_ID = 5;
 
 export class Raymarcher {
 	constructor({resolution, scenes}) {
@@ -88,54 +93,41 @@ export class Raymarcher {
 		code_injections['NUM_LIGHTS'] = lights.length.toFixed(0)
 		
 
-		// Store the material of each obejct in a uniform as we go through the lists
-		const object_material_id = []
-		let num_objects = 0;
+		const shapes = [];
 
-		function next_object_material(mat_name) {
-			object_material_id[num_objects] = material_id_by_name[mat_name]
-			//uniforms[`object_material_id[${num_objects}]`] = material_id_by_name[mat_name]
-			num_objects += 1
-		}
-
-		// Spheres
-		// Array of sphere geometry in uniforms
 		spheres.forEach((sph, idx) => {
-			uniforms[`spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius)
+			uniforms[`spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius);
 			
-			next_object_material(sph.material)
+			shapes.push({shape_id: SPHERE_ID, shape_index: idx, material_id: material_id_by_name[sph.material] });
 		})
-		// Fill NUM_SPHERES in shader source
+		
 		code_injections['NUM_SPHERES'] = spheres.length.toFixed(0)
 
-		// Planes
-		// Array of plane geometry in uniforms
+
 		planes.forEach((pl, idx) => {
 			const pl_norm = [0., 0., 0.]
 			vec3.normalize(pl_norm, pl.normal)
 			const pl_offset = vec3.dot(pl_norm, pl.center)
 			uniforms[`planes_normal_offset[${idx}]`] = pl_norm.concat(pl_offset)
 			
-			next_object_material(pl.material)
+			shapes.push({shape_id: PLANE_ID, shape_index: idx, material_id: material_id_by_name[pl.material] });
 		})
-		// Fill NUM_PLANES in shader source
+
 		code_injections['NUM_PLANES'] = planes.length.toFixed(0)
 
-		// Cylinders
-		// Array of cylinder geometry in uniforms
+
 		cylinders.forEach((cyl, idx) => {
 			uniforms[`cylinders[${idx}].center`] = cyl.center
 			uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
 			uniforms[`cylinders[${idx}].radius`] = cyl.radius
 			uniforms[`cylinders[${idx}].height`] = cyl.height
 			
-			next_object_material(cyl.material)
+			shapes.push({shape_id: CYLINDER_ID, shape_index: idx, material_id: material_id_by_name[cyl.material] });
 		})
-		// Fill NUM_CYLINDERS in shader source
+		
 		code_injections['NUM_CYLINDERS'] = cylinders.length.toFixed(0)
 		
 
-		// Boxes
 		boxes.forEach((box, idx) => {
 			uniforms[`boxes[${idx}].center`] = box.center
 			uniforms[`boxes[${idx}].length`] = box.length
@@ -146,9 +138,9 @@ export class Raymarcher {
 			uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
 			uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
 
-			next_object_material(box.material)
+			shapes.push({shape_id: BOX_ID, shape_index: idx, material_id: material_id_by_name[box.material] });
 		})
-		// Fill NUM_BOXES in shader source
+		
 		code_injections['NUM_BOXES'] = boxes.length.toFixed(0)
 		
 		
@@ -159,40 +151,18 @@ export class Raymarcher {
 			uniforms[`toruses[${idx}].rotation_y`] = toRadian(torus.rotation_y)
 			uniforms[`toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
 			
-			next_object_material(torus.material)
+			shapes.push({shape_id: TORUS_ID, shape_index: idx, material_id: material_id_by_name[torus.material] });
 		})
-		// Fill NUM_TORUSES in shader source
+		
 		code_injections['NUM_TORUSES'] = toruses.length.toFixed(0)
+
+		shapes.forEach((shape, idx) => {
+			uniforms[`shapes[${idx}].shape_id`] = shape.shape_id
+			uniforms[`shapes[${idx}].shape_index`] = shape.shape_index
+			uniforms[`shapes[${idx}].material_id`] = shape.material_id			
+		})		
+		code_injections['NUM_SHAPES'] = shapes.length.toFixed(0)
 		
-		
-
-		// Mesh
-		/*
-		const mesh_1 = await load_mesh_obj("resources/text.obj")
-		const mesh_offset = [-5.0, 0, 1.]
-		function get_vert(vert_id) {
-			const offset = vert_id*3
-			return vec3.add([0, 0, 0], mesh_1.vertices.slice(offset, offset+3), mesh_offset)
-		}
-		const num_faces = (mesh_1.indices.length / 3) | 0;
-		for(let i_face = 0; i_face < num_faces; i_face++) {
-			const iv1 = mesh_1.indices[3*i_face + 0]
-			const iv2 = mesh_1.indices[3*i_face + 1]
-			const iv3 = mesh_1.indices[3*i_face + 2]
-
-			uniforms[`triangles[${i_face}].vertices`] = get_vert(iv1).concat(get_vert(iv2), get_vert(iv3))
-			//uniforms[`triangles[${i_face}].normal`] = 
-		}
-		*/
-		code_injections['NUM_TRIANGLES'] = 0
-
-		// regl 2.1.0 loads a uniform array all at once
-		if(object_material_id.length > 1) {
-			uniforms['object_material_id'] = object_material_id
-		} else if (object_material_id.length == 1) {
-			uniforms['object_material_id[0]'] = object_material_id[0]
-		}
-
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		
 		const pipeline_raymarcher = this.regl({
