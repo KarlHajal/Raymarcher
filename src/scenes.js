@@ -310,18 +310,18 @@ SCENES.push({
 	intersections: [
 		{	
 			material: 'white',
-			smooth_factor: 0.4,
+			smooth_factor: 0.2,
 			shapes: [
-				{type: 'box', center: [0, 2, 0.1], length: 2, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0},
-				{type: 'sphere', center: [1, 2, 0.1], radius: 0.8}
+				{type: 'torus', center: [1, 0, 0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0},
+				{type: 'box', center: [1, 0, 0.5], length: 3, width: 3, height: 3, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0}
 			]
 		},
 		{	
 			material: 'white',
 			smooth_factor: 0,
 			shapes: [
-				{type: 'sphere', center: [2.5, 2, 0.1], radius: 0.8},
-				{type: 'sphere', center: [2, 2, 0.1], radius: 0.8}
+				{type: 'cylinder', center: [-2, 3, 0], radius: 1.5, height: 3, axis: [0, 1, 0]},
+				{type: 'torus', center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45}
 			]
 		},
 	]

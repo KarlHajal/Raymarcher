@@ -146,9 +146,21 @@ export class Raymarcher {
 			shapes_collection[idx].push({shape_id: SPHERE_ID, shape_index: primitives_collection.spheres.length});
 			primitives_collection.spheres.push(shape_properties);
 		}
+		else if (type === 'plane'){
+			shapes_collection[idx].push({shape_id: PLANE_ID, shape_index: primitives_collection.planes.length});
+			primitives_collection.planes.push(shape_properties);
+		}
+		else if (type === 'cylinder'){
+			shapes_collection[idx].push({shape_id: CYLINDER_ID, shape_index: primitives_collection.cylinders.length});
+			primitives_collection.cylinders.push(shape_properties);
+		}
 		else if (type === 'box'){
 			shapes_collection[idx].push({shape_id: BOX_ID, shape_index: primitives_collection.boxes.length});
 			primitives_collection.boxes.push(shape_properties);
+		}
+		else if (type === 'torus'){
+			shapes_collection[idx].push({shape_id: TORUS_ID, shape_index: primitives_collection.toruses.length});
+			primitives_collection.toruses.push(shape_properties);
 		}
 	}
 
@@ -200,6 +212,20 @@ export class Raymarcher {
 			uniforms[`combination_spheres_center_radius[${idx}]`] = sph.center.concat(sph.radius);
 		});
 
+		combination_primitives.planes.forEach((pl, idx) => {
+			const pl_norm = [0., 0., 0.];
+			vec3.normalize(pl_norm, pl.normal);
+			const pl_offset = vec3.dot(pl_norm, pl.center);
+			uniforms[`combination_planes_normal_offset[${idx}]`] = pl_norm.concat(pl_offset);
+		});
+
+		combination_primitives.cylinders.forEach((cyl, idx) => {
+			uniforms[`combination_cylinders[${idx}].center`] = cyl.center
+			uniforms[`combination_cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
+			uniforms[`combination_cylinders[${idx}].radius`] = cyl.radius
+			uniforms[`combination_cylinders[${idx}].height`] = cyl.height
+		});
+
 		combination_primitives.boxes.forEach((box, idx) => {
 			uniforms[`combination_boxes[${idx}].center`] = box.center;
 			uniforms[`combination_boxes[${idx}].length`] = box.length;
@@ -211,8 +237,19 @@ export class Raymarcher {
 			uniforms[`combination_boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius;
 		});
 
+		combination_primitives.toruses.forEach((torus, idx) => {
+			uniforms[`combination_toruses[${idx}].center`] = torus.center
+			uniforms[`combination_toruses[${idx}].radi`  ] = torus.radi
+			uniforms[`combination_toruses[${idx}].rotation_x`] = toRadian(torus.rotation_x)
+			uniforms[`combination_toruses[${idx}].rotation_y`] = toRadian(torus.rotation_y)
+			uniforms[`combination_toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
+		});
+
 		code_injections['COMBINATION_NUM_SPHERES'] = combination_primitives.spheres.length.toFixed(0);
+		code_injections['COMBINATION_NUM_PLANES'] = combination_primitives.planes.length.toFixed(0);
+		code_injections['COMBINATION_NUM_CYLINDERS'] = combination_primitives.cylinders.length.toFixed(0);
 		code_injections['COMBINATION_NUM_BOXES'] = combination_primitives.boxes.length.toFixed(0);
+		code_injections['COMBINATION_NUM_TORUSES'] = combination_primitives.toruses.length.toFixed(0);
 		code_injections['NUM_COMBINATIONS'] = combination_shapes.length.toFixed(0);
 
 		code_injections['NUM_INTERSECTIONS'] = scene.intersections ? scene.intersections.length.toFixed(0) : "0";

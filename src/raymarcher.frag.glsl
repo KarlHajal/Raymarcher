@@ -48,6 +48,10 @@ uniform vec4 combination_spheres_center_radius[COMBINATION_NUM_SPHERES];
 #if NUM_PLANES != 0
 uniform vec4 planes_normal_offset[NUM_PLANES]; // ...[i] = [nx, ny, nz, d] such that dot(vec3(nx, ny, nz), point_on_plane) = d
 #endif
+//#define COMBINATION_NUM_PLANES
+#if COMBINATION_NUM_PLANES != 0
+uniform vec4 combination_planes_normal_offset[COMBINATION_NUM_PLANES];
+#endif
 
 //#define NUM_CYLINDERS
 struct Cylinder {
@@ -58,6 +62,10 @@ struct Cylinder {
 };
 #if NUM_CYLINDERS != 0
 uniform Cylinder cylinders[NUM_CYLINDERS];
+#endif
+//#define COMBINATION_NUM_CYLINDERS
+#if COMBINATION_NUM_CYLINDERS != 0
+uniform Cylinder combination_cylinders[COMBINATION_NUM_CYLINDERS];
 #endif
 
 //#define NUM_BOXES
@@ -89,6 +97,10 @@ struct Torus {
 };
 #if NUM_TORUSES != 0
 uniform Torus toruses[NUM_TORUSES];
+#endif
+//#define COMBINATION_NUM_TORUSES
+#if COMBINATION_NUM_TORUSES != 0
+uniform Torus combination_toruses[COMBINATION_NUM_TORUSES];
 #endif
 
 // materials
@@ -139,6 +151,28 @@ vec4 get_sphere(int sphere_index){
 }
 #endif
 
+#if COMBINATION_NUM_PLANES != 0
+vec4 get_plane(int plane_index){
+	for(int i = 0; i < COMBINATION_NUM_PLANES; ++i){
+		if(i == plane_index){
+			return combination_planes_normal_offset[i];
+		}
+	}
+	return combination_planes_normal_offset[0];
+}
+#endif
+
+#if COMBINATION_NUM_CYLINDERS != 0
+Cylinder get_cylinder(int cylinder_index) {
+	for(int i = 0; i < COMBINATION_NUM_CYLINDERS; ++i){
+		if(i == cylinder_index){
+			return combination_cylinders[i];
+		}
+	}
+	return combination_cylinders[0];
+}
+#endif
+
 #if COMBINATION_NUM_BOXES != 0
 Box get_box(int box_index) {
 	for(int i = 0; i < COMBINATION_NUM_BOXES; ++i){
@@ -147,6 +181,17 @@ Box get_box(int box_index) {
 		}
 	}
 	return combination_boxes[0];
+}
+#endif
+
+#if COMBINATION_NUM_TORUSES != 0
+Torus get_torus(int torus_index) {
+	for(int i = 0; i < COMBINATION_NUM_TORUSES; ++i){
+		if(i == torus_index){
+			return combination_toruses[i];
+		}
+	}
+	return combination_toruses[0];
 }
 #endif
 
@@ -229,7 +274,6 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 	}
 	#endif
 
-
 	#if NUM_PLANES != 0 
 	for(int i = 0; i < NUM_PLANES; i++) {
 		float object_distance = plane_sdf(sample_point, planes_normal_offset[i]);
@@ -240,7 +284,6 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 		}
 	}
 	#endif
-
 
 	#if NUM_CYLINDERS != 0 
 	for(int i = 0; i < NUM_CYLINDERS; i++) {
@@ -253,7 +296,6 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 		}
 	}
 	#endif
-
 
 	#if NUM_BOXES != 0
 	for(int i = 0; i < NUM_BOXES; ++i) {
@@ -287,10 +329,28 @@ float shape_sdf(vec3 sample_point, int shape_id, int shape_index){
 		return sphere_sdf(sample_point, get_sphere(shape_index));
 	}
 	#endif
+
+	#if COMBINATION_NUM_PLANES != 0
+	if(shape_id == PLANE_ID){
+		return plane_sdf(sample_point, get_plane(shape_index));
+	}
+	#endif
 	
+	#if COMBINATION_NUM_CYLINDERS != 0
+	if(shape_id == CYLINDER_ID){
+		return capped_cylinder_sdf(sample_point, get_cylinder(shape_index));
+	}
+	#endif
+
 	#if COMBINATION_NUM_BOXES != 0
 	if (shape_id == BOX_ID){
 		return box_sdf(sample_point, get_box(shape_index));
+	}
+	#endif
+
+	#if COMBINATION_NUM_TORUSES != 0
+	if(shape_id == TORUS_ID){
+		return torus_sdf(sample_point, get_torus(shape_index));
 	}
 	#endif
 
