@@ -22,6 +22,7 @@ struct ShapesCombination {
 	int shape2_id;
 	int shape2_index;
 	int material_id;
+	float smooth_factor;
 };
 
 //#define NUM_INTERSECTIONS
@@ -292,6 +293,11 @@ float shape_sdf(vec3 sample_point, int shape_id, int shape_index){
 	return MAX_RANGE;
 }
 
+float intersection_sdf(float shape1_distance, float shape2_distance, float smooth_factor){
+	float h = clamp( 0.5 - 0.5*(shape2_distance-shape1_distance)/smooth_factor, 0.0, 1.0 );
+    return mix( shape2_distance, shape1_distance, h ) + smooth_factor*h*(1.0-h);
+}
+
 void intersections_sdf(vec3 sample_point, out float min_distance, out int material_id){
 	#if NUM_INTERSECTIONS != 0
 	for(int i = 0; i < NUM_INTERSECTIONS; ++i) {
@@ -300,7 +306,7 @@ void intersections_sdf(vec3 sample_point, out float min_distance, out int materi
 		float shape1_distance = shape_sdf(sample_point, intersection.shape1_id, intersection.shape1_index);
 		float shape2_distance = shape_sdf(sample_point, intersection.shape2_id, intersection.shape2_index);
 
-		float object_distance = max(shape1_distance, shape2_distance);
+		float object_distance = intersection_sdf(shape1_distance, shape2_distance, intersection.smooth_factor);
 
 		if(object_distance < min_distance) {
 			min_distance = object_distance;

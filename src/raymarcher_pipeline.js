@@ -174,7 +174,10 @@ export class Raymarcher {
 				this.add_shape(shape1, idx, intersection_shapes, intersection_primitives);
 				this.add_shape(shape2, idx, intersection_shapes, intersection_primitives);
 
-				intersection_shapes[idx].push({material_id: material_id_by_name[intersection.material]});
+				intersection_shapes[idx].push({
+					material_id: material_id_by_name[intersection.material],
+					smooth_factor: intersection.smooth_factor ? intersection.smooth_factor : 0
+				});
 			});
 
 			intersection_shapes.forEach((shapes, idx) => {
@@ -182,7 +185,8 @@ export class Raymarcher {
 				uniforms[`intersections[${idx}].shape1_index`] = shapes[0].shape_index
 				uniforms[`intersections[${idx}].shape2_id`] = shapes[1].shape_id
 				uniforms[`intersections[${idx}].shape2_index`] = shapes[1].shape_index
-				uniforms[`intersections[${idx}].material_id`] = shapes[2].material_id			
+				uniforms[`intersections[${idx}].material_id`] = shapes[2].material_id
+				uniforms[`intersections[${idx}].smooth_factor`] = shapes[2].smooth_factor				
 			});			
 
 			intersection_primitives.spheres.forEach((sph, idx) => {
