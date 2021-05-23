@@ -152,6 +152,26 @@ export class Raymarcher {
 		}
 	}
 
+	add_collection_of_shapes(combinations_to_add, shapes_collection, primitives_collection, material_id_by_name){
+		if(combinations_to_add){
+			const init_shapes_nb = shapes_collection.length;
+			combinations_to_add.forEach((combination, idx) => {
+				const shape1 = combination.shapes[0];
+				const shape2 = combination.shapes[1];
+				const shape_index = init_shapes_nb + idx;
+				shapes_collection[shape_index] = [];
+
+				this.add_shape(shape1, shape_index, shapes_collection, primitives_collection);
+				this.add_shape(shape2, shape_index, shapes_collection, primitives_collection);
+
+				shapes_collection[shape_index].push({
+					material_id: material_id_by_name[combination.material],
+					smooth_factor: combination.smooth_factor ? combination.smooth_factor : 0
+				});
+			});
+		}
+	}
+
 	process_combinations(scene, uniforms, material_id_by_name, code_injections){
 
 		const combination_shapes = [];
@@ -163,61 +183,9 @@ export class Raymarcher {
 			toruses: []
 		};
 
-		if(scene.intersections){
-			const intersections = scene.intersections;
-
-			intersections.forEach((intersection, idx) => {
-				const shape1 = intersection.shapes[0];
-				const shape2 = intersection.shapes[1];
-				combination_shapes[idx] = [];
-
-				this.add_shape(shape1, idx, combination_shapes, combination_primitives);
-				this.add_shape(shape2, idx, combination_shapes, combination_primitives);
-
-				combination_shapes[idx].push({
-					material_id: material_id_by_name[intersection.material],
-					smooth_factor: intersection.smooth_factor ? intersection.smooth_factor : 0
-				});
-			});
-		}
-
-		if(scene.unions){
-			const unions = scene.unions;
-			const init_shapes_nb = combination_shapes.length;
-			unions.forEach((union, idx) => {
-				const shape1 = union.shapes[0];
-				const shape2 = union.shapes[1];
-				const shape_index = init_shapes_nb + idx;
-				combination_shapes[shape_index] = [];
-
-				this.add_shape(shape1, shape_index, combination_shapes, combination_primitives);
-				this.add_shape(shape2, shape_index, combination_shapes, combination_primitives);
-
-				combination_shapes[shape_index].push({
-					material_id: material_id_by_name[union.material],
-					smooth_factor: union.smooth_factor ? union.smooth_factor : 0
-				});
-			});
-		}
-
-		if(scene.subtractions){
-			const subtractions = scene.subtractions;
-			const init_shapes_nb = combination_shapes.length;
-			subtractions.forEach((subtraction, idx) => {
-				const shape1 = subtraction.shapes[0];
-				const shape2 = subtraction.shapes[1];
-				const shape_index = init_shapes_nb + idx;
-				combination_shapes[shape_index] = [];
-
-				this.add_shape(shape1, shape_index, combination_shapes, combination_primitives);
-				this.add_shape(shape2, shape_index, combination_shapes, combination_primitives);
-
-				combination_shapes[shape_index].push({
-					material_id: material_id_by_name[subtraction.material],
-					smooth_factor: subtraction.smooth_factor ? subtraction.smooth_factor : 0
-				});
-			});
-		}
+		this.add_collection_of_shapes(scene.intersections, combination_shapes, combination_primitives, material_id_by_name);
+		this.add_collection_of_shapes(scene.unions, combination_shapes, combination_primitives, material_id_by_name);
+		this.add_collection_of_shapes(scene.subtractions, combination_shapes, combination_primitives, material_id_by_name);
 
 		combination_shapes.forEach((shapes, idx) => {
 			uniforms[`combinations[${idx}].shape1_id`] = shapes[0].shape_id
