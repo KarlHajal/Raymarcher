@@ -416,5 +416,42 @@ SCENES.push({
 	]
 });
 
+SCENES.push({
+	name: 'Unions',
+	camera: {
+		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+	},
+	materials: [
+		{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+		{name: 'white', color: [0.9, 0.9, 0.9],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+	],
+	lights: [
+		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
+	],
+	primitives: {
+		planes: [
+			{center: [0, 0, -3], normal: [0, 0, 1], material: 'floor'},
+		]
+	},
+	unions: [
+		{	
+			material: 'white',
+			smooth_factor: 0.7,
+			shapes: [
+				{type: 'box', center: [-1, 2, 0.1], length: 2.5, width: 2.5, height: 0.7, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.1},
+				{type: 'sphere', center: [-1, 2, 0.5], radius: 0.8}
+			]
+		},
+		{	
+			material: 'white',
+			smooth_factor: 0.3,
+			shapes: [
+				{type: 'sphere', center: [2.8, 2, 0.1], radius: 0.5},
+				{type: 'sphere', center: [1.8, 2, 0.1], radius: 0.5}
+			]
+		},
+	]
+});
+
 
 export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))

@@ -25,19 +25,22 @@ struct ShapesCombination {
 	float smooth_factor;
 };
 
-//#define NUM_INTERSECTIONS
-#if NUM_INTERSECTIONS != 0
-uniform ShapesCombination intersections[NUM_INTERSECTIONS];
+//#define NUM_COMBINATIONS
+#if NUM_COMBINATIONS != 0
+uniform ShapesCombination combinations[NUM_COMBINATIONS];
 #endif
+
+//#define NUM_INTERSECTIONS
+//#define NUM_UNIONS
 
 
 //#define NUM_SPHERES
 #if NUM_SPHERES != 0
 uniform vec4 spheres_center_radius[NUM_SPHERES]; // ...[i] = [center_x, center_y, center_z, radius]
 #endif
-//#define INTERSECTION_NUM_SPHERES
-#if INTERSECTION_NUM_SPHERES != 0
-uniform vec4 intersection_spheres_center_radius[INTERSECTION_NUM_SPHERES];
+//#define COMBINATION_NUM_SPHERES
+#if COMBINATION_NUM_SPHERES != 0
+uniform vec4 combination_spheres_center_radius[COMBINATION_NUM_SPHERES];
 #endif
 
 //#define NUM_PLANES
@@ -70,9 +73,9 @@ struct Box {
 #if NUM_BOXES != 0
 uniform Box boxes[NUM_BOXES];
 #endif
-//#define INTERSECTION_NUM_BOXES
-#if INTERSECTION_NUM_BOXES != 0
-uniform Box intersection_boxes[INTERSECTION_NUM_BOXES];
+//#define COMBINATION_NUM_BOXES
+#if COMBINATION_NUM_BOXES != 0
+uniform Box combination_boxes[COMBINATION_NUM_BOXES];
 #endif
 
 //#define NUM_TORUSES
@@ -124,25 +127,25 @@ Material get_mat2(int mat_id) {
 	return m;
 }
 
-#if INTERSECTION_NUM_SPHERES != 0
+#if COMBINATION_NUM_SPHERES != 0
 vec4 get_sphere(int sphere_index){
-	for(int i = 0; i < INTERSECTION_NUM_SPHERES; ++i){
+	for(int i = 0; i < COMBINATION_NUM_SPHERES; ++i){
 		if(i == sphere_index){
-			return intersection_spheres_center_radius[i];
+			return combination_spheres_center_radius[i];
 		}
 	}
-	return intersection_spheres_center_radius[0];
+	return combination_spheres_center_radius[0];
 }
 #endif
 
-#if INTERSECTION_NUM_BOXES != 0
+#if COMBINATION_NUM_BOXES != 0
 Box get_box(int box_index) {
-	for(int i = 0; i < INTERSECTION_NUM_BOXES; ++i){
+	for(int i = 0; i < COMBINATION_NUM_BOXES; ++i){
 		if(i == box_index){
-			return intersection_boxes[i];
+			return combination_boxes[i];
 		}
 	}
-	return intersection_boxes[0];
+	return combination_boxes[0];
 }
 #endif
 
@@ -278,13 +281,13 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 
 float shape_sdf(vec3 sample_point, int shape_id, int shape_index){
 
-	#if INTERSECTION_NUM_SPHERES != 0
+	#if COMBINATION_NUM_SPHERES != 0
 	if(shape_id == SPHERE_ID){
 		return sphere_sdf(sample_point, get_sphere(shape_index));
 	}
 	#endif
 	
-	#if INTERSECTION_NUM_BOXES != 0
+	#if COMBINATION_NUM_BOXES != 0
 	if (shape_id == BOX_ID){
 		return box_sdf(sample_point, get_box(shape_index));
 	}
@@ -301,7 +304,7 @@ float intersection_sdf(float shape1_distance, float shape2_distance, float smoot
 void intersections_sdf(vec3 sample_point, out float min_distance, out int material_id){
 	#if NUM_INTERSECTIONS != 0
 	for(int i = 0; i < NUM_INTERSECTIONS; ++i) {
-		ShapesCombination intersection = intersections[i];
+		ShapesCombination intersection = combinations[i];
 
 		float shape1_distance = shape_sdf(sample_point, intersection.shape1_id, intersection.shape1_index);
 		float shape2_distance = shape_sdf(sample_point, intersection.shape2_id, intersection.shape2_index);
@@ -316,12 +319,36 @@ void intersections_sdf(vec3 sample_point, out float min_distance, out int materi
 	#endif
 }
 
+float union_sdf(float shape1_distance, float shape2_distance, float smooth_factor){
+	float h = clamp( 0.5 + 0.5*(shape2_distance-shape1_distance)/smooth_factor, 0.0, 1.0 );
+    return mix( shape2_distance, shape1_distance, h ) - smooth_factor*h*(1.0-h);
+}
+
+void unions_sdf(vec3 sample_point, out float min_distance, out int material_id){
+	#if NUM_UNIONS != 0
+	for(int i = 0; i < NUM_UNIONS; ++i) {
+		ShapesCombination zunion = combinations[NUM_INTERSECTIONS + i];
+
+		float shape1_distance = shape_sdf(sample_point, zunion.shape1_id, zunion.shape1_index);
+		float shape2_distance = shape_sdf(sample_point, zunion.shape2_id, zunion.shape2_index);
+
+		float object_distance = union_sdf(shape1_distance, shape2_distance, zunion.smooth_factor);
+
+		if(object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id = zunion.material_id;
+		}
+	}
+	#endif
+}
+
 float scene_sdf(vec3 sample_point, out int material_id) {
 
 	float min_distance = MAX_RANGE;
 
 	primitives_sdf(sample_point, min_distance, material_id);
 	intersections_sdf(sample_point, min_distance, material_id);
+	unions_sdf(sample_point, min_distance, material_id);
 
     return min_distance;
 }
