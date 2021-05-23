@@ -32,6 +32,7 @@ uniform ShapesCombination combinations[NUM_COMBINATIONS];
 
 //#define NUM_INTERSECTIONS
 //#define NUM_UNIONS
+//#define NUM_SUBTRACTIONS
 
 
 //#define NUM_SPHERES
@@ -342,6 +343,29 @@ void unions_sdf(vec3 sample_point, out float min_distance, out int material_id){
 	#endif
 }
 
+float subtraction_sdf(float shape1_distance, float shape2_distance, float smooth_factor){
+	float h = clamp( 0.5 - 0.5*(shape2_distance+shape1_distance)/smooth_factor, 0.0, 1.0 );
+    return mix( shape2_distance, -shape1_distance, h ) + smooth_factor*h*(1.0-h);
+}
+
+void subtractions_sdf(vec3 sample_point, out float min_distance, out int material_id){
+	#if NUM_SUBTRACTIONS != 0
+	for(int i = 0; i < NUM_SUBTRACTIONS; ++i) {
+		ShapesCombination subtraction = combinations[NUM_INTERSECTIONS + NUM_UNIONS + i];
+
+		float shape1_distance = shape_sdf(sample_point, subtraction.shape1_id, subtraction.shape1_index);
+		float shape2_distance = shape_sdf(sample_point, subtraction.shape2_id, subtraction.shape2_index);
+
+		float object_distance = subtraction_sdf(shape1_distance, shape2_distance, subtraction.smooth_factor);
+
+		if(object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id = subtraction.material_id;
+		}
+	}
+	#endif
+}
+
 float scene_sdf(vec3 sample_point, out int material_id) {
 
 	float min_distance = MAX_RANGE;
@@ -349,6 +373,7 @@ float scene_sdf(vec3 sample_point, out int material_id) {
 	primitives_sdf(sample_point, min_distance, material_id);
 	intersections_sdf(sample_point, min_distance, material_id);
 	unions_sdf(sample_point, min_distance, material_id);
+	subtractions_sdf(sample_point, min_distance, material_id);
 
     return min_distance;
 }

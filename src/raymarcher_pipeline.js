@@ -200,6 +200,25 @@ export class Raymarcher {
 			});
 		}
 
+		if(scene.subtractions){
+			const subtractions = scene.subtractions;
+			const init_shapes_nb = combination_shapes.length;
+			subtractions.forEach((subtraction, idx) => {
+				const shape1 = subtraction.shapes[0];
+				const shape2 = subtraction.shapes[1];
+				const shape_index = init_shapes_nb + idx;
+				combination_shapes[shape_index] = [];
+
+				this.add_shape(shape1, shape_index, combination_shapes, combination_primitives);
+				this.add_shape(shape2, shape_index, combination_shapes, combination_primitives);
+
+				combination_shapes[shape_index].push({
+					material_id: material_id_by_name[subtraction.material],
+					smooth_factor: subtraction.smooth_factor ? subtraction.smooth_factor : 0
+				});
+			});
+		}
+
 		combination_shapes.forEach((shapes, idx) => {
 			uniforms[`combinations[${idx}].shape1_id`] = shapes[0].shape_id
 			uniforms[`combinations[${idx}].shape1_index`] = shapes[0].shape_index
@@ -228,10 +247,9 @@ export class Raymarcher {
 		code_injections['COMBINATION_NUM_BOXES'] = combination_primitives.boxes.length.toFixed(0);
 		code_injections['NUM_COMBINATIONS'] = combination_shapes.length.toFixed(0);
 
-		const num_intersections = scene.intersections ? scene.intersections.length.toFixed(0) : "0";
-		const num_unions = scene.unions ? scene.unions.length.toFixed(0) : "0";
-		code_injections['NUM_INTERSECTIONS'] = num_intersections;
-		code_injections['NUM_UNIONS'] = num_unions;
+		code_injections['NUM_INTERSECTIONS'] = scene.intersections ? scene.intersections.length.toFixed(0) : "0";
+		code_injections['NUM_UNIONS'] = scene.unions ? scene.unions.length.toFixed(0) : "0";
+		code_injections['NUM_SUBTRACTIONS'] = scene.subtractions ? scene.subtractions.length.toFixed(0) : "0";
 	}
 
 	ray_marcher_pipeline_for_scene(scene) {
