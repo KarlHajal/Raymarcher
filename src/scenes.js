@@ -33,28 +33,6 @@ SCENES.push({
 		]
 	}
 });
-
-SCENES.push({
-	name: "cylinders",
-	camera: {
-		position: [0, 3, 8], target: [0, 1, 0], up: [0, 1, 0], fov: 45,
-	},
-	materials: [
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.3, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-	],
-	lights: [
-		{position: [20, 50, 0], color: [1.0, 0.4, 0.2]},
-		{position: [50, 50, 50], color: [0.2, 0.4, 0.9]},
-		{position: [-50, 50, 50], color: [0.2, 0.8, 0.2]},
-	],
-	primitives: {
-		cylinders: [
-			{center: [-1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [-1, 1, 1], material: 'white'},
-			{center: [ 0.0, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [0, 1, 1], material: 'white'},
-			{center: [ 1.5, 1.0, 0.0], radius: 0.5, height: 1.5, axis: [1, 1, 1], material: 'white'},
-		]
-	}
-});
 	
 SCENES.push({
 	name: 'shading-example',
@@ -137,38 +115,6 @@ SCENES.push({
 })
 
 SCENES.push({
-	name: 'desk',
-	camera: {
-		position: [0., 0., -1.], target: [0., 0, 0.], up: [0, 1, 0], fov: 65,
-	},
-	materials: [
-		{name: 'wall', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.},
-		{name: 'table', color: [0.49, 0.49, 0.38], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.03},
-		{name: 'pot', color: [0.76, 0.76, 0.68], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-		{name: 'pen', color: [1., 0.65, 0.17], ambient: 0.1, diffuse: 0.9, specular: 1.0, shininess: 8., mirror: 0.03},
-		{name: 'rubber', color: [0.60, 0.30, 0.24], ambient: 0.2, diffuse: 0.5, specular: 0., shininess: 4., mirror: 0.1},
-		{name: 'metal', color: [0.85, 0.85, 0.85], ambient: 0.2, diffuse: 0.5, specular: 1.0, shininess: 4., mirror: 0.3},
-	],
-	lights: [
-		{position: [0.3, 0.35, -0.15], color: [0.9, 0.8, 0.7]},
-	],
-	primitives: {
-		spheres: [
-			{center: [-0.588, 0.096, 0.324], radius: 0.01, material: 'rubber'},
-		],
-		planes: [
-			{center: [0., 0., 1.5], normal: [0., 0., 1.], material: 'wall'},
-			{center: [0., -0.4, 0.], normal: [0., 1., 0.], material: 'table'},
-		],
-		cylinders: [
-			{center: [-0.2, -0.25, 0.1], radius: 0.2, height: 0.3, axis: [0., 1., 0.], material: 'pot'},
-			{center: [-0.304, -0.15, 0.16], radius: 0.01, height: 0.7, axis: [-0.693, 0.6, 0.4], material: 'pen'},
-			{center: [-0.564, 0.075, 0.31], radius: 0.011, height: 0.05, axis: [-0.693, 0.6, 0.4], material: 'metal'},
-		]
-	}
-});
-
-SCENES.push({
 	name: 'mirror1',
 	camera: {
 		position: [0.5, -2, 0.4], target: [0.5, 0, 0.4], up: [0, 0, 1], fov: 65,
@@ -196,41 +142,6 @@ SCENES.push({
 		],
 		cylinders: [
 			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
-			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
-		]
-	}
-});
-
-SCENES.push({
-	name: 'mirror2',
-	camera: {
-		position: [0.5, -2, 0.4], target: [0.5, 0, 0.4], up: [0, 0, 1], fov: 65,
-	},
-	materials: [
-		{name: 'floor', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 1.0, shininess: 8., mirror: 0.9},
-		{name: 'particleR', color: [0.9, 0.3, 0.1], ambient: 0.2, diffuse: 0.5, specular: 0.9, shininess: 10., mirror: 0.1},
-		{name: 'particleB', color: [0.1, 0.3, 0.9], ambient: 0.2, diffuse: 0.5, specular: 0.9, shininess: 10., mirror: 0.1},
-	],
-	lights: [
-		{position: [2.5, 2.5, 4], color: [1.0, 0.8, 0.5]},
-		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
-	],
-	primitives: {
-		spheres: [
-			{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
-			{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
-			{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
-		],
-		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-			{center: [-5, 5, 0], normal: [-2, 1, 0], material: 'mirror'},
-			{center: [ 5, 5, 0], normal: [1.5, 1, 0], material: 'mirror'},
-
-		],
-		cylinders: [
 			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
 			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
 		]
