@@ -469,7 +469,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     return end;
 }
 
-float calculate_soft_shadow(vec3 sample_point, Light light){
+float calculate_soft_shadow(vec3 sample_point, Light light, float factor){
 	vec3 L = normalize(light.position - sample_point);
 	vec3 displaced_origin = sample_point + L * 0.1;
 	int temp_id;
@@ -480,7 +480,7 @@ float calculate_soft_shadow(vec3 sample_point, Light light){
 
         float dist = scene_sdf(displaced_origin + depth * L, temp_id);
         
-		res = min( res, 10.0*dist/depth );
+		res = min( res, factor*dist/depth );
         
 		depth += dist;
         
@@ -494,10 +494,6 @@ float calculate_soft_shadow(vec3 sample_point, Light light){
 
 vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light light, Material material) {
 
-	float soft_shadow = calculate_soft_shadow(sample_point, light);
-	if(soft_shadow < EPSILON){
-		return vec3(0.);
-	}
 
     vec3 L = normalize(light.position - sample_point);
     float dotLN = dot(L, normal);
@@ -509,7 +505,8 @@ vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light li
     vec3 V = normalize(eye - sample_point);
     vec3 R = normalize(reflect(-L, normal));
     float dotRV = dot(R, V);
-
+	
+	float soft_shadow = calculate_soft_shadow(sample_point, light, 128.0);
 	vec3 color = material.color * light.color * material.diffuse * dotLN * soft_shadow;
 
     if (dotRV > 0.) {
