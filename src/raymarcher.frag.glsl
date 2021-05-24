@@ -469,32 +469,48 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     return end;
 }
 
-bool is_shadow(vec3 p, Light light){
-    vec3 L = normalize(light.position - p);
-	vec3 displaced_origin = p + L * 0.1;
+float calculate_soft_shadow(vec3 sample_point, Light light){
+	vec3 L = normalize(light.position - sample_point);
+	vec3 displaced_origin = sample_point + L * 0.1;
 	int temp_id;
-	float dist = shortest_distance_to_surface(displaced_origin, L, MIN_DISTANCE, MAX_DISTANCE, temp_id);
-	return dist < length(light.position - displaced_origin);
+
+	float res = 1.0;
+	float depth = MIN_DISTANCE;
+    for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
+
+        float dist = scene_sdf(displaced_origin + depth * L, temp_id);
+        
+		res = min( res, 10.0*dist/depth );
+        
+		depth += dist;
+        
+		if ( res < EPSILON || depth > MAX_DISTANCE) {
+            break;
+        }
+    }
+	res = clamp( res, 0.0, 1.0 );
+    return res*res*(3.0-2.0*res);
 }
 
-vec3 phong_light_contribution(vec3 p, vec3 eye, vec3 normal, Light light, Material material) {
+vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light light, Material material) {
 
-	if(is_shadow(p, light)){
+	float soft_shadow = calculate_soft_shadow(sample_point, light);
+	if(soft_shadow < EPSILON){
 		return vec3(0.);
 	}
 
-    vec3 L = normalize(light.position - p);
+    vec3 L = normalize(light.position - sample_point);
     float dotLN = dot(L, normal);
     
     if (dotLN < EPSILON) {
         return vec3(0.0, 0.0, 0.0);
     } 
     
-    vec3 V = normalize(eye - p);
+    vec3 V = normalize(eye - sample_point);
     vec3 R = normalize(reflect(-L, normal));
     float dotRV = dot(R, V);
 
-	vec3 color = material.color * light.color * material.diffuse * dotLN;
+	vec3 color = material.color * light.color * material.diffuse * dotLN * soft_shadow;
 
     if (dotRV > 0.) {
         color += material.color * light.color * material.specular * pow(dotRV, material.shininess);
