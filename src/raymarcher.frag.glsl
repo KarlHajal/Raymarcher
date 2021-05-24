@@ -533,7 +533,6 @@ vec3 get_random_hemisphere_ray_direction(vec3 normal, float seed){
 }
 
 float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
-
 	int intersections = 0;
 	int temp_id;
 
@@ -546,7 +545,21 @@ float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 		}
 	}
 
-	return float(intersections) / float(NUM_AMBIENT_OCCLUSION_SAMPLES); 
+	return float(intersections) / float(NUM_AMBIENT_OCCLUSION_SAMPLES);
+}
+
+float ambient_occlusion_contribution2(vec3 sample_point, vec3 normal){
+	int temp_id;
+	float occ = 0.0;
+    float sca = 1.0;
+    for( int i=0; i<8; i++ )
+    {
+        float h = 0.001 + 0.15*float(i)/4.0;
+        float d = scene_sdf( sample_point + h*normal, temp_id );
+        occ += (h-d)*sca;
+        sca *= 0.95;
+    }
+    return 1. - clamp( 1.0 - 1.5*occ, 0.0, 1.0 ); 
 }
 
 vec3 compute_lighting(vec3 sample_point, vec3 eye, vec3 normal, Material material) {
