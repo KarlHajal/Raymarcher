@@ -10,6 +10,7 @@ precision highp float;
 #define MAX_RANGE 1e6
 //#define NUM_REFLECTIONS
 
+//#define ENVIRONMENT_MAPPING
 uniform samplerCube cubemap_texture;
 
 const int SPHERE_ID = 1;
@@ -614,9 +615,10 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 		float dist = shortest_distance_to_surface(ray_origin, ray_direction, start, end, material_id);
 
 		if (dist > end - EPSILON) { // No collision
+			#if ENVIRONMENT_MAPPING != 0
 			vec4 cube = textureCube(cubemap_texture, ray_direction);
 			color += product_coeff * cube.xyz;
-			// if no env mapping, just break
+			#endif
 			break;
 		}
 		

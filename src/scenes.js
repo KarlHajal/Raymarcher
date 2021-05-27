@@ -160,6 +160,7 @@ SCENES.push({
 		{position: [3., 0, -0.5], color: [1.0, 0.4, 0.2]},
 		{position: [-3., -0.8, 3], color: [0.2, 0.4, 0.9]},
 	],
+	cubemap: "lycksele",
 	primitives:{
 		toruses: [
 			{center: [0.0, 0.0, 2.0],  radi: [1.0, 0.7], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'mirror'},

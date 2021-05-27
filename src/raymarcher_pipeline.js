@@ -295,12 +295,18 @@ export class Raymarcher {
 		this.process_primitives(scene, uniforms, material_id_by_name, code_injections);
 		this.process_combinations(scene, uniforms, material_id_by_name, code_injections);
 
-		const cubemap = this.regl.cube(
-			this.resources_ready.cubemap_posx, this.resources_ready.cubemap_negx,
-			this.resources_ready.cubemap_posy, this.resources_ready.cubemap_negy,
-			this.resources_ready.cubemap_posz, this.resources_ready.cubemap_negz);
+		if(scene.cubemap){
+			const cubemap = this.regl.cube(
+				this.resources_ready[scene.cubemap + '_posx'], this.resources_ready[scene.cubemap + '_negx'],
+				this.resources_ready[scene.cubemap + '_posy'], this.resources_ready[scene.cubemap + '_negy'],
+				this.resources_ready[scene.cubemap + '_posz'], this.resources_ready[scene.cubemap + '_negz']);
 
-		uniforms[`cubemap_texture`] = cubemap;
+			code_injections['ENVIRONMENT_MAPPING'] = "1";
+			uniforms[`cubemap_texture`] = cubemap;
+		}
+		else{
+			code_injections['ENVIRONMENT_MAPPING'] = "0";
+		}
 
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
@@ -338,6 +344,16 @@ export class Raymarcher {
 		return pipeline_raymarcher
 	}
 
+	add_cubemap(resources, cubemap_name){
+		const path = "./textures/cubemaps/" + cubemap_name + "/";
+		resources[cubemap_name + "_posx"] = load_image(path + 'posx.jpg');
+		resources[cubemap_name + "_posy"] = load_image(path + 'posy.jpg');
+		resources[cubemap_name + "_posz"] = load_image(path + 'posz.jpg');
+		resources[cubemap_name + "_negx"] = load_image(path + 'negx.jpg');
+		resources[cubemap_name + "_negy"] = load_image(path + 'negy.jpg');
+		resources[cubemap_name + "_negz"] = load_image(path + 'negz.jpg');
+	}
+
 	async init(regl) {
 		this.regl = regl
 
@@ -346,14 +362,12 @@ export class Raymarcher {
 			raymarcher_vert: load_text('./src/raymarcher.vert.glsl'),
 			show_frag: load_text('./src/show_buffer.frag.glsl'),
 			show_vert: load_text('./src/show_buffer.vert.glsl'),
-
-			cubemap_posx: load_image('./textures/lycksele_cubemap/posx.jpg'),
-			cubemap_posy: load_image('./textures/lycksele_cubemap/posy.jpg'),
-			cubemap_posz: load_image('./textures/lycksele_cubemap/posz.jpg'),
-			cubemap_negx: load_image('./textures/lycksele_cubemap/negx.jpg'),
-			cubemap_negy: load_image('./textures/lycksele_cubemap/negy.jpg'),
-			cubemap_negz: load_image('./textures/lycksele_cubemap/negz.jpg'),
 		}
+
+		const cubemaps = ["lycksele"];
+		cubemaps.forEach((cubemap) => {
+			this.add_cubemap(this.resources, cubemap);
+		});
 
 		this.result_buffer = regl.texture({
 			width: this.resolution[0],
