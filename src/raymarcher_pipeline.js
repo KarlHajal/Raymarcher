@@ -1,5 +1,5 @@
 
-import {load_text} from "./icg_web.js"
+import {load_text, load_image} from "./icg_web.js"
 import {framebuffer_to_image_download} from "./icg_screenshot.js"
 import * as vec3 from "../lib/gl-matrix_3.3.0/esm/vec3.js"
 import { toRadian } from "../lib/gl-matrix_3.3.0/esm/common.js"
@@ -295,6 +295,13 @@ export class Raymarcher {
 		this.process_primitives(scene, uniforms, material_id_by_name, code_injections);
 		this.process_combinations(scene, uniforms, material_id_by_name, code_injections);
 
+		const cubemap = this.regl.cube(
+			this.resources_ready.cubemap_posx, this.resources_ready.cubemap_negx,
+			this.resources_ready.cubemap_posy, this.resources_ready.cubemap_negy,
+			this.resources_ready.cubemap_posz, this.resources_ready.cubemap_negz);
+
+		uniforms[`cubemap_texture`] = cubemap;
+
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		
@@ -339,6 +346,13 @@ export class Raymarcher {
 			raymarcher_vert: load_text('./src/raymarcher.vert.glsl'),
 			show_frag: load_text('./src/show_buffer.frag.glsl'),
 			show_vert: load_text('./src/show_buffer.vert.glsl'),
+
+			cubemap_posx: load_image('./textures/lycksele_cubemap/posx.jpg'),
+			cubemap_posy: load_image('./textures/lycksele_cubemap/posy.jpg'),
+			cubemap_posz: load_image('./textures/lycksele_cubemap/posz.jpg'),
+			cubemap_negx: load_image('./textures/lycksele_cubemap/negx.jpg'),
+			cubemap_negy: load_image('./textures/lycksele_cubemap/negy.jpg'),
+			cubemap_negz: load_image('./textures/lycksele_cubemap/negz.jpg'),
 		}
 
 		this.result_buffer = regl.texture({

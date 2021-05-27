@@ -10,6 +10,8 @@ precision highp float;
 #define MAX_RANGE 1e6
 //#define NUM_REFLECTIONS
 
+uniform samplerCube cubemap_texture;
+
 const int SPHERE_ID = 1;
 const int PLANE_ID = 2;
 const int CYLINDER_ID = 3;
@@ -114,7 +116,7 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0) || (NUM_TORUSES != 0)
+#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TORUSES != 0)
 uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES];
 #endif
 //#define NUM_LIGHTS
@@ -612,7 +614,9 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 		float dist = shortest_distance_to_surface(ray_origin, ray_direction, start, end, material_id);
 
 		if (dist > end - EPSILON) { // No collision
-			gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+			vec4 cube = textureCube(cubemap_texture, ray_direction);
+			color += product_coeff * cube.xyz;
+			// if no env mapping, just break
 			break;
 		}
 		

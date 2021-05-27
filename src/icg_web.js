@@ -123,5 +123,5 @@ function register_button_with_hotkey(button_id, hotkey, func) {
 	document.getElementById(button_id).addEventListener('click', func)
 }
 
-export {DOM_loaded_promise, register_keyboard_action, register_button_with_hotkey, keyboard_actions, load_texture, load_text}
+export {DOM_loaded_promise, register_keyboard_action, register_button_with_hotkey, keyboard_actions, load_image, load_texture, load_text}
 

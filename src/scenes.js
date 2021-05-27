@@ -149,6 +149,25 @@ SCENES.push({
 });
 
 SCENES.push({
+	name: "Environment-Mapping",
+	camera: {
+		position: [0, 1.5, -3], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+	},
+	materials: [
+		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.},
+	],
+	lights: [
+		{position: [3., 0, -0.5], color: [1.0, 0.4, 0.2]},
+		{position: [-3., -0.8, 3], color: [0.2, 0.4, 0.9]},
+	],
+	primitives:{
+		toruses: [
+			{center: [0.0, 0.0, 2.0],  radi: [1.0, 0.7], rotation_x : 0 , rotation_y : 0, rotation_z : 0  , material : 'mirror'},
+		],
+	}
+});
+
+SCENES.push({
 	name: 'Ambient-Occlusion',
 	camera: {
 		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
