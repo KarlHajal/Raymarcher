@@ -196,7 +196,7 @@ SCENES.push({
 });
 
 SCENES.push({
-	name: 'Spheres+Cylinders',
+	name: 'Spheres + Cylinders + Capsules',
 	camera: {
 		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
 	},
@@ -230,11 +230,67 @@ SCENES.push({
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], material: 'white'},
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 1, material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], is_capsule: 1, material: 'white'},
 		]
+	}
+});
+
+SCENES.push({
+	name: 'Box - Triangles - Box Frame - Cones - Hexagonal - Triangular - Ellipse - Pyramid - OctaHedron',
+	camera: {
+		position: [4.8, 13, 6.4], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+	},
+	materials: [
+		{name: 'floor', color: [0.7, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+		{name: 'white', color: [0.9, 0.8, 0.8],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'color1', color: [0.6, 0.2, 0.2],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'color2', color: [0.2, 0.6, 0.2],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'color3', color: [0.2, 0.2, 0.6],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'color4', color: [0.6, 0.2, 0.6],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'color5', color: [0.4, 0.5, 0.2],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
+		{name: 'color6', color: [0.7, 0.8, 0.6],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
+		],
+	lights: [
+		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
+		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
+	],
+	primitives: {
+		boxes: [
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, is_frame:1, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0, is_frame:0, material: 'color1'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, is_frame:0, material: 'color4'},
+			{center: [0, -3, 0.4], length: 2, width: 3, height: 4, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, is_frame:0, material: 'white'},
+			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'color2'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.1, is_frame:1, material: 'color4'},
+		],
+		triangles: [
+			{vertice1: [4,3,3], vertice2: [4,3,3], vertice3: [4,3,3], material: 'color2'},
+			{vertice1: [5,2.4,1], vertice2: [4,3.1,1], vertice3: [3.5,2.4,2.5], material: 'color5'},
+		],
+		links: [
+			{center: [5,-2.3,1], length: 1, radius1: 0.2, radius2: 0.1, material:'color1'},
+		],
+		cones: [
+			{center: [-5,4,0.4], sin_cos: [5, 33], height:4, material:'color3'}
+		],
+		hexagonals: [
+			{center: [-10, -6, 0.15], heights: [1,1.5], material:'color3'}
+		],
+		triangulars: [
+			{center: [6.5, 1.2, 0.2], heights: [0.6,1], material:'color1'}
+		],
+		ellipsoids: [
+			{center: [6.5, 4.6, 0.1], radius: [0.85,0.2,0.7], material:'color6'}
+		],
+		octahedrons: [
+			{center: [-6.5, 4.6, 0.1], length: 1, material:'color6'}
+		],
+		pyramids: [
+			{center: [0.5, 6.2, 0.1], height: 1.3, material:'color6'}
+		],
 	}
 });
 
