@@ -469,7 +469,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     return end;
 }
 
-float calculate_soft_shadow(vec3 sample_point, Light light, float factor){
+/*float calculate_soft_shadow(vec3 sample_point, Light light, float factor){
 	vec3 L = normalize(light.position - sample_point);
 	vec3 displaced_origin = sample_point + L * 0.1;
 	int temp_id;
@@ -490,10 +490,21 @@ float calculate_soft_shadow(vec3 sample_point, Light light, float factor){
     }
 	res = clamp( res, 0.0, 1.0 );
     return res*res*(3.0-2.0*res);
+}*/
+
+bool is_shadow(vec3 sample_point, Light light){
+    vec3 L = normalize(light.position - sample_point);
+	vec3 displaced_origin = sample_point + L * 0.1;
+	int temp_id;
+	float dist = shortest_distance_to_surface(displaced_origin, L, MIN_DISTANCE, MAX_DISTANCE, temp_id);
+	return dist < length(light.position - displaced_origin);
 }
 
 vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light light, Material material) {
 
+	if(is_shadow(sample_point, light)){
+		return vec3(0.);
+	}
 
     vec3 L = normalize(light.position - sample_point);
     float dotLN = dot(L, normal);
@@ -506,8 +517,9 @@ vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light li
     vec3 R = normalize(reflect(-L, normal));
     float dotRV = dot(R, V);
 	
-	float soft_shadow = calculate_soft_shadow(sample_point, light, 128.0);
-	vec3 color = material.color * light.color * material.diffuse * dotLN * soft_shadow;
+	//float soft_shadow = calculate_soft_shadow(sample_point, light, 128.0);
+	//vec3 color = material.color * light.color * material.diffuse * dotLN * soft_shadow;
+	vec3 color = material.color * light.color * material.diffuse * dotLN;
 
     if (dotRV > 0.) {
         color += material.color * light.color * material.specular * pow(dotRV, material.shininess);
