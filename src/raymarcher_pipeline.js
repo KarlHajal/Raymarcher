@@ -23,6 +23,15 @@ const PLANE_ID = 2;
 const CYLINDER_ID = 3;
 const BOX_ID = 4;
 const TORUS_ID = 5;
+const TRIANGLE_ID = 6;
+const LINK_ID = 7;
+const CONE_ID = 8;
+const HEXAGONAL_ID = 9;
+const TRIANGULAR_ID = 10;
+const ELLIPSOID_ID = 11;
+const OCTAHEDRON_ID = 12;
+const PYRAMID_ID = 13;
+
 
 export class Raymarcher {
 	constructor({resolution, scenes}) {
@@ -97,6 +106,8 @@ export class Raymarcher {
 				uniforms[`cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
 				uniforms[`cylinders[${idx}].radius`] = cyl.radius
 				uniforms[`cylinders[${idx}].height`] = cyl.height
+				uniforms[`cylinders[${idx}].is_capsule`] = cyl.is_capsule
+
 				
 				next_object_material(cyl.material)
 			})
@@ -113,6 +124,7 @@ export class Raymarcher {
 				uniforms[`boxes[${idx}].rotation_y`] = toRadian(box.rotation_y)
 				uniforms[`boxes[${idx}].rotation_z`] = toRadian(box.rotation_z)
 				uniforms[`boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius
+				uniforms[`boxes[${idx}].is_frame`] = box.is_frame
 
 				next_object_material(box.material)
 			})
@@ -130,6 +142,88 @@ export class Raymarcher {
 				next_object_material(torus.material)
 			})
 			code_injections['NUM_TORUSES'] = toruses.length.toFixed(0);
+
+			const triangles = primitives.triangles ? primitives.triangles : [];
+			triangles.forEach((triangle, idx) => {
+				uniforms[`triangles[${idx}].vertice1`] = triangle.vertice1
+				uniforms[`triangles[${idx}].vertice2`] = triangle.vertice2
+				uniforms[`triangles[${idx}].vertice3`] = triangle.vertice3
+	
+				next_object_material(triangle.material)
+			})
+			code_injections['NUM_TRIANGLES'] = triangles.length.toFixed(0)
+
+			const links = primitives.links ? primitives.links : [];
+			links.forEach((link, idx) => {
+				uniforms[`links[${idx}].center`] = link.center
+				uniforms[`links[${idx}].length`] = link.length
+				uniforms[`links[${idx}].radius1`] = link.radius1
+				uniforms[`links[${idx}].radius2`] = link.radius2
+	
+				next_object_material(link.material)
+			})
+			code_injections['NUM_LINKS'] = links.length.toFixed(0)
+
+
+			const cones = primitives.cones ? primitives.cones : [];
+			cones.forEach((cone, idx) => {
+				uniforms[`cones[${idx}].center`] = cone.center
+				uniforms[`cones[${idx}].height`] = cone.height
+				uniforms[`cones[${idx}].sin_cos`] = cone.sin_cos
+	
+				next_object_material(cone.material)
+			})
+			code_injections['NUM_CONES'] = cones.length.toFixed(0)
+
+			
+			const hexagonals = primitives.hexagonals ? primitives.hexagonals : [];
+			hexagonals.forEach((hexagonal, idx) => {
+				uniforms[`hexagonals[${idx}].center`] = hexagonal.center
+				uniforms[`hexagonals[${idx}].heights`] = hexagonal.heights
+	
+				next_object_material(hexagonal.material)
+			})
+			code_injections['NUM_HEXAGONALS'] = hexagonals.length.toFixed(0)
+
+
+			const triangulars = primitives.triangulars ? primitives.triangulars : [];
+			triangulars.forEach((triangular, idx) => {
+				uniforms[`triangulars[${idx}].center`] = triangular.center
+				uniforms[`triangulars[${idx}].heights`] = triangular.heights
+	
+				next_object_material(triangular.material)
+			})
+			code_injections['NUM_TRIANGULARS'] = triangulars.length.toFixed(0)
+
+
+			const ellipsoids = primitives.ellipsoids ? primitives.ellipsoids : [];
+			ellipsoids.forEach((ellipsoid, idx) => {
+				uniforms[`ellipsoids[${idx}].center`] = ellipsoid.center
+				uniforms[`ellipsoids[${idx}].radius`] = ellipsoid.radius
+	
+				next_object_material(ellipsoid.material)
+			})
+			code_injections['NUM_ELLIPSOIDS'] = ellipsoids.length.toFixed(0)
+
+
+			const octahedrons = primitives.octahedrons ? primitives.octahedrons : [];
+			octahedrons.forEach((octahedron, idx) => {
+				uniforms[`octahedrons[${idx}].center`] = octahedron.center
+				uniforms[`octahedrons[${idx}].length`] = octahedron.length
+	
+				next_object_material(octahedron.material)
+			})
+			code_injections['NUM_OCTAHEDRONS'] = octahedrons.length.toFixed(0)
+
+			
+			const pyramids = primitives.pyramids ? primitives.pyramids : [];
+			pyramids.forEach((pyramid, idx) => {
+				uniforms[`pyramids[${idx}].center`] = pyramid.center
+				uniforms[`pyramids[${idx}].height`] = pyramid.height
+	
+				next_object_material(pyramid.material)
+			})
+			code_injections['NUM_PYRAMIDS'] = pyramids.length.toFixed(0)
 
 			// regl 2.1.0 loads a uniform array all at once
 			if(object_material_id.length > 1) {
@@ -162,6 +256,38 @@ export class Raymarcher {
 			shapes_collection[idx].push({shape_id: TORUS_ID, shape_index: primitives_collection.toruses.length});
 			primitives_collection.toruses.push(shape_properties);
 		}
+		else if (type === 'triangle'){
+			shapes_collection[idx].push({shape_id: TRIANGLE_ID, shape_index: primitives_collection.triangles.length});
+			primitives_collection.planes.push(shape_properties);
+		}
+		else if (type === 'link'){
+			shapes_collection[idx].push({shape_id: LINK_ID, shape_index: primitives_collection.links.length});
+			primitives_collection.cylinders.push(shape_properties);
+		}
+		else if (type === 'cone'){
+			shapes_collection[idx].push({shape_id: CONE_ID, shape_index: primitives_collection.cones.length});
+			primitives_collection.boxes.push(shape_properties);
+		}
+		else if (type === 'hexagonal'){
+			shapes_collection[idx].push({shape_id: HEXAGONAL_ID, shape_index: primitives_collection.hexagonals.length});
+			primitives_collection.hexagonals.push(shape_properties);
+		}
+		else if (type === 'triangular'){
+			shapes_collection[idx].push({shape_id: TRIANGULAR_ID, shape_index: primitives_collection.triangulars.length});
+			primitives_collection.triangulars.push(shape_properties);
+		}
+		else if (type === 'ellipsoid'){
+			shapes_collection[idx].push({shape_id: ELLIPSOID_ID, shape_index: primitives_collection.ellipsoids.length});
+			primitives_collection.ellipsoids.push(shape_properties);
+		}
+		else if (type === 'octahedron'){
+			shapes_collection[idx].push({shape_id: OCTAHEDRON_ID, shape_index: primitives_collection.octahedrons.length});
+			primitives_collection.octahedrons.push(shape_properties);
+		}
+		else if (type === 'pyramid'){
+			shapes_collection[idx].push({shape_id: PYRAMID_ID, shape_index: primitives_collection.pyramids.length});
+			primitives_collection.pyramids.push(shape_properties);
+		}
 	}
 
 	add_collection_of_shapes(combinations_to_add, shapes_collection, primitives_collection, material_id_by_name){
@@ -192,7 +318,15 @@ export class Raymarcher {
 			spheres: [],
 			boxes: [],
 			cylinders: [],
-			toruses: []
+			toruses: [],
+			triangles: [],
+			links: [],
+			cones: [],
+			hexagonals: [],
+			triangulars: [],
+			ellipsoids: [],
+			octahedrons: [],
+			pyramids: []
 		};
 
 		this.add_collection_of_shapes(scene.intersections, combination_shapes, combination_primitives, material_id_by_name);
@@ -224,6 +358,7 @@ export class Raymarcher {
 			uniforms[`combination_cylinders[${idx}].axis`] = vec3.normalize([0, 0, 0], cyl.axis)
 			uniforms[`combination_cylinders[${idx}].radius`] = cyl.radius
 			uniforms[`combination_cylinders[${idx}].height`] = cyl.height
+			uniforms[`combination_cylinders[${idx}].is_capsule`] = cyl.is_capsule
 		});
 
 		combination_primitives.boxes.forEach((box, idx) => {
@@ -235,6 +370,8 @@ export class Raymarcher {
 			uniforms[`combination_boxes[${idx}].rotation_y`] = toRadian(box.rotation_y);
 			uniforms[`combination_boxes[${idx}].rotation_z`] = toRadian(box.rotation_z);
 			uniforms[`combination_boxes[${idx}].rounded_edges_radius`] = box.rounded_edges_radius;
+			uniforms[`combination_boxes[${idx}].is_frame`] = box.is_frame
+
 		});
 
 		combination_primitives.toruses.forEach((torus, idx) => {
@@ -245,11 +382,63 @@ export class Raymarcher {
 			uniforms[`combination_toruses[${idx}].rotation_z`] = toRadian(torus.rotation_z)
 		});
 
+		combination_primitives.triangles.forEach((triangle, idx) => {
+			uniforms[`combination_triangles[${idx}].vertice1`] = triangle.vertice1
+			uniforms[`combination_triangles[${idx}].vertice2`] = triangle.vertice2
+			uniforms[`combination_triangles[${idx}].vertice3`] = triangle.vertice3
+		})
+
+		combination_primitives.links.forEach((link, idx) => {
+			uniforms[`combination_links[${idx}].center`] = link.center
+			uniforms[`combination_links[${idx}].length`] = link.length
+			uniforms[`combination_links[${idx}].radius1`] = link.radius1
+			uniforms[`combination_links[${idx}].radius2`] = link.radius2
+		})
+
+		combination_primitives.cones.forEach((cone, idx) => {
+			uniforms[`combination_cones[${idx}].center`] = cone.center
+			uniforms[`combination_cones[${idx}].height`] = cone.height
+			uniforms[`combination_cones[${idx}].sin_cos`] = cone.sin_cos
+		})
+
+		combination_primitives.hexagonals.forEach((hexagonal, idx) => {
+			uniforms[`combination_hexagonals[${idx}].center`] = hexagonal.center
+			uniforms[`combination_hexagonals[${idx}].heights`] = hexagonal.heights
+		})
+
+		combination_primitives.triangulars.forEach((triangular, idx) => {
+			uniforms[`combination_triangulars[${idx}].center`] = triangular.center
+			uniforms[`combination_triangulars[${idx}].heights`] = triangular.heights
+		})
+
+		combination_primitives.ellipsoids.forEach((ellipsoid, idx) => {
+			uniforms[`combination_ellipsoids[${idx}].center`] = ellipsoid.center
+			uniforms[`combination_ellipsoids[${idx}].radius`] = ellipsoid.radius
+		})
+
+		combination_primitives.octahedrons.forEach((octahedron, idx) => {
+			uniforms[`combination_octahedrons[${idx}].center`] = octahedron.center
+			uniforms[`combination_octahedrons[${idx}].length`] = octahedron.length
+		})
+		
+		combination_primitives.pyramids.forEach((pyramid, idx) => {
+			uniforms[`combination_pyramids[${idx}].center`] = pyramid.center
+			uniforms[`combination_pyramids[${idx}].height`] = pyramid.height
+		})
+
 		code_injections['COMBINATION_NUM_SPHERES'] = combination_primitives.spheres.length.toFixed(0);
 		code_injections['COMBINATION_NUM_PLANES'] = combination_primitives.planes.length.toFixed(0);
 		code_injections['COMBINATION_NUM_CYLINDERS'] = combination_primitives.cylinders.length.toFixed(0);
 		code_injections['COMBINATION_NUM_BOXES'] = combination_primitives.boxes.length.toFixed(0);
 		code_injections['COMBINATION_NUM_TORUSES'] = combination_primitives.toruses.length.toFixed(0);
+		code_injections['COMBINATION_NUM_TRIANGLES'] = combination_primitives.triangles.length.toFixed(0);
+		code_injections['COMBINATION_NUM_LINKS'] = combination_primitives.links.length.toFixed(0);
+		code_injections['COMBINATION_NUM_CONES'] = combination_primitives.cones.length.toFixed(0);
+		code_injections['COMBINATION_NUM_HEXAGONALS'] = combination_primitives.hexagonals.length.toFixed(0);
+		code_injections['COMBINATION_NUM_TRIANGULARS'] = combination_primitives.triangulars.length.toFixed(0);
+		code_injections['COMBINATION_NUM_ELLIPSOIDS'] = combination_primitives.ellipsoids.length.toFixed(0);
+		code_injections['COMBINATION_NUM_OCTAHEDRONS'] = combination_primitives.octahedrons.length.toFixed(0);
+		code_injections['COMBINATION_NUM_PYRAMIDS'] = combination_primitives.pyramids.length.toFixed(0);
 		code_injections['NUM_COMBINATIONS'] = combination_shapes.length.toFixed(0);
 
 		code_injections['NUM_INTERSECTIONS'] = scene.intersections ? scene.intersections.length.toFixed(0) : "0";
