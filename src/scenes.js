@@ -29,7 +29,7 @@ SCENES.push({
 			{center: [0.0, -1., 0.], normal: [0., 1., 0.], material: 'mirror'}, // bottom
 		],
 		cylinders: [
-			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], material: 'green'},
+			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], is_capsule: 0, material: 'green'},
 		]
 	}
 });
@@ -53,8 +53,8 @@ SCENES.push({
 			{center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
 		],
 		cylinders: [
-			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, material: 'shiny'},
-			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, material: 'white'},
+			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, is_capsule: 0, material: 'shiny'},
+			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, is_capsule: 0, material: 'white'},
 		],
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
@@ -81,7 +81,7 @@ SCENES.push({
 		cylinders: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => { 
 			const a = i * Math.PI * 2 / 8 + 0.123
 			const r = 3
-			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, material: 'shiny' }
+			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, is_capsule: 0, material: 'shiny' }
 		}),
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
@@ -141,9 +141,9 @@ SCENES.push({
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], material: 'mirror'},
-			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], material: 'white'},
-			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], material: 'white'},
+			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], is_capsule: 0, material: 'mirror'},
+			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], is_capsule: 0, material: 'white'},
 		]
 	}
 });
@@ -228,9 +228,9 @@ SCENES.push({
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		cylinders: [
-			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
-			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], material: 'white'},
+			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
+			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
 		]
 	}
 });
@@ -352,12 +352,12 @@ SCENES.push({
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
 		],
 		boxes: [
-			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0, material: 'white'},
-			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius: 0,  material: 'white'},
-			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0, material: 'white'},
-			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.2, material: 'white'},
-			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, material: 'white'},
-			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0.3, material: 'white'},
+			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.2, is_frame:0, material: 'white'},
+			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
+			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
 		]
 	}
 });
@@ -409,14 +409,14 @@ SCENES.push({
 			smooth_factor: 0.2,
 			shapes: [
 				{type: 'torus', center: [1, 0, 0],  radi: [1.5,0.75], rotation_x : 0 , rotation_y : 0, rotation_z : 0},
-				{type: 'box', center: [1, 0, 0.5], length: 3, width: 3, height: 3, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0}
+				{type: 'box', center: [1, 0, 0.5], length: 3, width: 3, height: 3, rotation_x: 0, rotation_y: 0, rotation_z: 0, is_frame:0, rounded_edges_radius: 0}
 			]
 		},
 		{	
 			material: 'white',
 			smooth_factor: 0,
 			shapes: [
-				{type: 'cylinder', center: [-2, 3, 0], radius: 1.5, height: 3, axis: [0, 1, 0]},
+				{type: 'cylinder', center: [-2, 3, 0], radius: 1.5, height: 3, is_capsule: 0, axis: [0, 1, 0]},
 				{type: 'torus', center: [-2,3,0], radi: [1.5,0.75], rotation_x : 45, rotation_y : 0, rotation_z : -45}
 			]
 		},
@@ -445,7 +445,7 @@ SCENES.push({
 			material: 'white',
 			smooth_factor: 0.7,
 			shapes: [
-				{type: 'box', center: [-1, 2, 0.1], length: 2.5, width: 2.5, height: 0.7, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.1},
+				{type: 'box', center: [-1, 2, 0.1], length: 2.5, width: 2.5, height: 0.7, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.1, is_frame: 0},
 				{type: 'sphere', center: [-1, 2, 0.5], radius: 0.8}
 			]
 		},
@@ -483,7 +483,7 @@ SCENES.push({
 			smooth_factor: 0.05,
 			shapes: [
 				{type: 'sphere', center: [-1, 2, 0.5], radius: 1.4},
-				{type: 'box', center: [-1, 2, 0.1], length: 2.5, width: 2.5, height: 0.7, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.1}
+				{type: 'box', center: [-1, 2, 0.1], length: 2.5, width: 2.5, height: 0.7, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.1, is_frame: 0}
 			]
 		},
 		{	

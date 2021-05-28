@@ -258,15 +258,15 @@ export class Raymarcher {
 		}
 		else if (type === 'triangle'){
 			shapes_collection[idx].push({shape_id: TRIANGLE_ID, shape_index: primitives_collection.triangles.length});
-			primitives_collection.planes.push(shape_properties);
+			primitives_collection.triangles.push(shape_properties);
 		}
 		else if (type === 'link'){
 			shapes_collection[idx].push({shape_id: LINK_ID, shape_index: primitives_collection.links.length});
-			primitives_collection.cylinders.push(shape_properties);
+			primitives_collection.links.push(shape_properties);
 		}
 		else if (type === 'cone'){
 			shapes_collection[idx].push({shape_id: CONE_ID, shape_index: primitives_collection.cones.length});
-			primitives_collection.boxes.push(shape_properties);
+			primitives_collection.cones.push(shape_properties);
 		}
 		else if (type === 'hexagonal'){
 			shapes_collection[idx].push({shape_id: HEXAGONAL_ID, shape_index: primitives_collection.hexagonals.length});

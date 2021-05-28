@@ -125,6 +125,7 @@ struct Cone {
 #if NUM_CONES != 0
 uniform Cone cones[NUM_CONES];
 #endif
+//#define COMBINATION_NUM_CONES
 #if COMBINATION_NUM_CONES != 0
 uniform Cone combination_cones[COMBINATION_NUM_CONES];
 #endif
@@ -137,6 +138,7 @@ struct Hexagonal {
 #if NUM_HEXAGONALS != 0
 uniform Hexagonal hexagonals[NUM_HEXAGONALS];
 #endif
+//#define COMBINATION_NUM_HEXAGONALS
 #if COMBINATION_NUM_HEXAGONALS != 0
 uniform Hexagonal combination_hexagonals[COMBINATION_NUM_HEXAGONALS];
 #endif
@@ -149,6 +151,7 @@ struct Triangular {
 #if NUM_TRIANGULARS != 0
 uniform Triangular triangulars[NUM_TRIANGULARS];
 #endif
+//#define COMBINATION_NUM_TRIANGULARS
 #if COMBINATION_NUM_TRIANGULARS != 0
 uniform Triangular combination_triangulars[COMBINATION_NUM_TRIANGULARS];
 #endif
@@ -161,6 +164,7 @@ struct Ellipsoid {
 #if NUM_ELLIPSOIDS != 0
 uniform Ellipsoid ellipsoids[NUM_ELLIPSOIDS];
 #endif
+//#define COMBINATION_NUM_ELLIPSOIDS
 #if COMBINATION_NUM_ELLIPSOIDS != 0
 uniform Ellipsoid combination_ellipsoids[COMBINATION_NUM_ELLIPSOIDS];
 #endif
@@ -173,6 +177,7 @@ struct Octahedron {
 #if NUM_OCTAHEDRONS != 0
 uniform Octahedron octahedrons[NUM_OCTAHEDRONS];
 #endif
+//#define COMBINATION_NUM_OCTAHEDRONS
 #if COMBINATION_NUM_OCTAHEDRONS != 0
 uniform Octahedron combination_octahedrons[COMBINATION_NUM_OCTAHEDRONS];
 #endif
@@ -185,6 +190,7 @@ struct Pyramid {
 #if NUM_PYRAMIDS != 0
 uniform Pyramid pyramids[NUM_PYRAMIDS];
 #endif
+//#define COMBINATION_NUM_PYRAMIDS
 #if COMBINATION_NUM_PYRAMIDS != 0
 uniform Pyramid combination_pyramids[COMBINATION_NUM_PYRAMIDS];
 #endif
@@ -199,6 +205,7 @@ struct Link {
 #if NUM_LINKS != 0
 uniform Link links[NUM_LINKS];
 #endif
+//#define COMBINATION_NUM_LINKS
 #if COMBINATION_NUM_LINKS != 0
 uniform Link combination_links[COMBINATION_NUM_LINKS];
 #endif
@@ -213,6 +220,7 @@ struct Triangle {
 #if NUM_TRIANGLES != 0
 uniform Triangle triangles[NUM_TRIANGLES];
 #endif
+//#define COMBINATION_NUM_TRIANGLES
 #if COMBINATION_NUM_TRIANGLES != 0
 uniform Triangle combination_triangles[COMBINATION_NUM_TRIANGLES];
 #endif
@@ -228,8 +236,8 @@ struct Material {
 	float mirror;
 };
 uniform Material materials[NUM_MATERIALS];
-#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TRIANGLES != 0) || (NUM_LINKS != 0) || (NUM_CONES != 0) || (NUM_HEXAGONALS != 0) || (NUM_TRIANGULARS != 0) || (NUM_ELLIPSOIDS != 0) || (NUM_OCTAHEDRONS != 0) || (NUM_PYRAMIDS != 0) 
-uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_SOLIDS + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + NUM_PYRAMIDS];
+#if (NUM_SPHERES != 0) || (NUM_PLANES != 0) || (NUM_CYLINDERS != 0) || (NUM_BOXES != 0) || (NUM_TORUSES != 0) || (NUM_TRIANGLES != 0) || (NUM_LINKS != 0) || (NUM_CONES != 0) || (NUM_HEXAGONALS != 0) || (NUM_TRIANGULARS != 0) || (NUM_ELLIPSOIDS != 0) || (NUM_OCTAHEDRONS != 0) || (NUM_PYRAMIDS != 0) 
+uniform int object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + NUM_PYRAMIDS];
 #endif
 //#define NUM_LIGHTS
 struct Light {
@@ -504,13 +512,6 @@ float box_sdf(vec3 sample_point, Box box){
 	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
 	vec3 b = vec3(box.length, box.width, box.height)/2.;
 	vec3 q = abs(transformed_point) - b; 
-  	return length(max(q,0.0)) + min(max(q.x,max(q.y,q.z)),0.0) - box.rounded_edges_radius;
-}
-
-float box_sdf(vec3 sample_point, Box box){
-	vec3 transformed_point = transform_point_to_centered_shape(sample_point, box.center, box.rotation_x, box.rotation_y, box.rotation_z);
-	vec3 b = vec3(box.length, box.width, box.height)/2.;
-	vec3 q = abs(transformed_point) - b; 
 	if(box.is_frame == 1){
 		vec3 p = q;
 		vec3 q = abs(p + 0.05) - 0.05;
@@ -642,8 +643,7 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 
 	#if NUM_CYLINDERS != 0 
 	for(int i = 0; i < NUM_CYLINDERS; i++) {
-		Cylinder cylinder = cylinders[i];
-		float object_distance = capped_cylinder_sdf(sample_point, cylinder);
+		float object_distance = capped_cylinder_sdf(sample_point, cylinders[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
@@ -654,8 +654,7 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 
 	#if NUM_BOXES != 0
 	for(int i = 0; i < NUM_BOXES; ++i) {
-		Box box = boxes[i];
-		float object_distance = box_sdf(sample_point, box);
+		float object_distance = box_sdf(sample_point, boxes[i]);
 
 		if(object_distance < min_distance) {
 			min_distance = object_distance;
@@ -664,117 +663,101 @@ void primitives_sdf(vec3 sample_point, out float min_distance, out int material_
 	}
 	#endif
 
-	#if NUM_TRIANGLES != 0
-	for(int i = 0; i < NUM_TRIANGLES; i++) {
+	#if NUM_TORUSES != 0
+	for(int i = 0; i < NUM_TORUSES; ++i) {
+		float object_distance = torus_sdf(sample_point, toruses[i]);
 
-		float object_distance = triangle_sdf(sample_point, triangles[i]);
-
-		if (object_distance < min_distance) {
+		if(object_distance < min_distance) {
 			min_distance = object_distance;
 			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + i];
 		}
 	}
 	#endif
 
+	#if NUM_TRIANGLES != 0
+	for(int i = 0; i < NUM_TRIANGLES; i++) {
+		float object_distance = triangle_sdf(sample_point, triangles[i]);
+
+		if (object_distance < min_distance) {
+			min_distance = object_distance;
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + i];
+		}
+	}
+	#endif
+
 	#if NUM_LINKS != 0
 	for(int i = 0; i < NUM_LINKS; i++) {
-
-
 		float object_distance = link_sdf(sample_point, links[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + i];
 		}
 	}
 	#endif
 
 	#if NUM_CONES != 0
 	for(int i = 0; i < NUM_CONES; i++) {
-
-
 		float object_distance = cone_sdf(sample_point, cones[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + i];
 		}
 	}
 	#endif
 
 	#if NUM_HEXAGONALS != 0
 	for(int i = 0; i < NUM_HEXAGONALS; i++) {
-
-
 		float object_distance = hex_prism_sdf(sample_point, hexagonals[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + i];
 		}
 	}
 	#endif
 
 	#if NUM_TRIANGULARS != 0
 	for(int i = 0; i < NUM_TRIANGULARS; i++) {
-
-
 		float object_distance = triangular_sdf(sample_point, triangulars[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + i];
-		}
-	}
-	#endif
-
-	#if NUM_TORUSES != 0
-	for(int i = 0; i < NUM_TORUSES; ++i) {
-		Torus torus = toruses[i];
-		float object_distance = torus_sdf(sample_point, torus);
-
-		if(object_distance < min_distance) {
-			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + i];
 		}
 	}
 	#endif
 
 	#if NUM_ELLIPSOIDS != 0
 	for(int i = 0; i < NUM_ELLIPSOIDS; i++) {
-
-
 		float object_distance = ellipsoid_sdf(sample_point, ellipsoids[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_TORUSES + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + i];
 		}
 	}
 	#endif
 
 	#if NUM_OCTAHEDRONS != 0
 	for(int i = 0; i < NUM_OCTAHEDRONS; i++) {
-
-
 		float object_distance = octahedron_sdf(sample_point, octahedrons[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_TORUSES + NUM_ELLIPSOIDS + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_ELLIPSOIDS + i];
 		}
 	}
 	#endif
 
 	#if NUM_PYRAMIDS != 0
 	for(int i = 0; i < NUM_PYRAMIDS; i++) {
-
-
 		float object_distance = pyramid_sdf(sample_point, pyramids[i]);
 
 		if (object_distance < min_distance) {
 			min_distance = object_distance;
-			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_TORUSES + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + i];
+			material_id =  object_material_id[NUM_SPHERES + NUM_PLANES + NUM_CYLINDERS + NUM_BOXES + NUM_TORUSES + NUM_TRIANGLES + NUM_LINKS + NUM_CONES + NUM_HEXAGONALS + NUM_TRIANGULARS + NUM_ELLIPSOIDS + NUM_OCTAHEDRONS + i];
 		}
 	}
 	#endif
