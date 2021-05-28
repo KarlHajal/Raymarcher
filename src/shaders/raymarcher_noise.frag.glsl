@@ -31,9 +31,21 @@ float noise(vec3 p)
 	return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
+float fbm(vec3 x) {
+	float v = 0.0;
+	float a = 0.5;
+	vec3 shift = vec3(100);
+	for (int i = 0; i < 5; ++i) {
+		v += a * noise(x);
+		x = x * 2.0 + shift;
+		a *= 0.5;
+	}
+	return v;
+}
+
 float noise_sdf(vec3 ray)
 {
-	return noise(ray) - 1.0;
+	return fbm(ray) - 1.0;
 }
 
 vec3 compute_pixel_color(vec3 origin, vec3 ray, vec2 uv)
@@ -46,8 +58,8 @@ vec3 compute_pixel_color(vec3 origin, vec3 ray, vec2 uv)
         if (d < EPSILON)
         {
             float t = current_time / 10.0;
-            color.r = cos(uv.x + t + sin(uv.y));
-            color.g = sin(uv.y - t + cos(uv.x));
+            color.r = cos(uv.x + 5.+ sin(uv.y));
+            color.g = sin(uv.y + 5. + cos(uv.x));
             color.b = 0.0;
             color = color * 0.5 + 0.5;
             float a = float(i) / MAX_ITERATIONS;
@@ -63,7 +75,7 @@ void main() {
 	vec3 ray_origin = v2f_ray_origin;
 	vec3 ray_direction = normalize(v2f_ray_direction);
 
-    ray_origin[2] += current_time/10.0;
+    ray_origin[2] += current_time/50.0;
     vec3 pix_color = compute_pixel_color(ray_origin, ray_direction, ray_direction.xy);
 	
 	gl_FragColor = vec4(pix_color, 1.);
