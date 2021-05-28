@@ -529,7 +529,15 @@ export class Raymarcher {
 		const code_injections = {};
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_noise_frag, code_injections)
-		
+
+		scene.cubemap = "interstellar";
+		const cubemap = this.regl.cube(
+			this.resources_ready[scene.cubemap + '_posx'], this.resources_ready[scene.cubemap + '_negx'],
+			this.resources_ready[scene.cubemap + '_posy'], this.resources_ready[scene.cubemap + '_negy'],
+			this.resources_ready[scene.cubemap + '_posz'], this.resources_ready[scene.cubemap + '_negz']);
+
+		uniforms[`cubemap_texture`] = cubemap;
+
 		const pipeline_raymarcher = this.regl({
 			attributes: {
 				vertex_position: mesh_quad_2d.position,
