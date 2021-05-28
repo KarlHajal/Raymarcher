@@ -40,6 +40,8 @@ export class Raymarcher {
 		this.scenes_by_name = Object.fromEntries(scenes.map((sc) => [sc.name, sc]))
 		this.scene_name = null
 		this.num_reflections = 2
+		this.noise_iteration = 0;
+		this.noise_interval = null;
 	}
 
 	shader_inject_defines(shader_src, code_injections) {
@@ -501,33 +503,43 @@ export class Raymarcher {
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		
 		const pipeline_raymarcher = this.regl({
-			// Vertex attributes
 			attributes: {
 				vertex_position: mesh_quad_2d.position,
 			},
 			elements: mesh_quad_2d.faces,
-				
-			// Uniforms: global data available to the shader
 			uniforms: uniforms,	
 				
 			depth: { enable: false },
-		
-			/* 
-			Vertex shader program
-			Given vertex attributes, it calculates the position of the vertex on screen
-			and intermediate data ("varying") passed on to the fragment shader
-			*/
 			vert: this.resources_ready.raymarcher_vert,
-				
-			/* 
-			Fragment shader program
-			Calculates the color of each pixel covered by the mesh.
-			The "varying" values are interpolated between the values given by the vertex shader on the vertices of the current triangle.
-			*/
 			frag: shader_frag,
 
 			framebuffer: this.result_framebuffer,
-			//viewport: {x:0, y:0, width: result_wh[0], height: result_wh[1]},
+		})
+
+		return pipeline_raymarcher
+	}
+
+	ray_marcher_pipeline_for_noise(scene) {
+		const camera = scene.camera;
+		const uniforms = {}
+		Object.assign(uniforms, this.gen_uniforms_camera(camera))
+
+		uniforms[`current_time`] = this.noise_iteration;
+
+		const code_injections = {};
+
+		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_noise_frag, code_injections)
+		
+		const pipeline_raymarcher = this.regl({
+			attributes: {
+				vertex_position: mesh_quad_2d.position,
+			},
+			elements: mesh_quad_2d.faces,
+			uniforms: uniforms,	
+			depth: { enable: false },
+			vert: this.resources_ready.raymarcher_vert,
+			frag: shader_frag,
+			framebuffer: this.result_framebuffer,
 		})
 
 		return pipeline_raymarcher
@@ -548,6 +560,7 @@ export class Raymarcher {
 
 		this.resources = {
 			raymarcher_frag: load_text('./src/shaders/raymarcher.frag.glsl'),
+			raymarcher_noise_frag: load_text('./src/shaders/raymarcher_noise.frag.glsl'),
 			raymarcher_vert: load_text('./src/shaders/raymarcher.vert.glsl'),
 			show_frag: load_text('./src/shaders/show_buffer.frag.glsl'),
 			show_vert: load_text('./src/shaders/show_buffer.vert.glsl'),
@@ -596,29 +609,48 @@ export class Raymarcher {
 		return this.scenes.map((s) => s.name)
 	}
 
-	async draw_scene({scene_name, num_reflections}) {
-		if (num_reflections === undefined || num_reflections < 0) {
-			num_reflections = this.num_reflections
-		}
+	execute_pipeline(pipeline){
+		pipeline();
+		pipeline.destroy();
+		this.regenerate_view();
+	}
 
-		const scene_def = this.scenes_by_name[scene_name]
+	async draw_scene({scene_name, num_reflections}) {
+
+		const scene_def = this.scenes_by_name[scene_name];
 
 		if(! scene_def) {
 			console.error(`No scene ${scene_name}`)
 			return 
 		}
 
-		if(scene_name != this.scene_name || num_reflections != this.num_reflections) {
+		if (num_reflections === undefined || num_reflections < 0) {
+			num_reflections = this.num_reflections
+		}
+
+		if(scene_name !== this.scene_name && scene_name === "3D Perlin Noise"){
+			if(this.noise_interval !== null){
+				clearInterval(this.noise_interval);
+				this.noise_interval = null;
+			}
+
+			this.scene_name = scene_name
+
+			this.noise_iteration = 0;
+			this.noise_interval = setInterval(() => {
+				this.execute_pipeline(this.ray_marcher_pipeline_for_noise(scene_def))
+				this.noise_iteration += 1;
+			}, 100);
+		}		
+		else if(scene_name !== this.scene_name || num_reflections !== this.num_reflections) {
+			if(this.noise_interval !== null){
+				clearInterval(this.noise_interval);
+				this.noise_interval = null;
+			}
+
 			this.scene_name = scene_name
 			this.num_reflections = num_reflections
-
-			const pipe = this.ray_marcher_pipeline_for_scene(scene_def)
-
-			pipe()
-
-			pipe.destroy()
-
-			this.regenerate_view()
+			this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
 		}
 	}
 

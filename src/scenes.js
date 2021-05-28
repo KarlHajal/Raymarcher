@@ -497,5 +497,11 @@ SCENES.push({
 	]
 });
 
+SCENES.push({
+	name: '3D Perlin Noise',
+	camera: {
+		position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+	},
+});
 
 export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))
