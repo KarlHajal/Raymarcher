@@ -364,7 +364,7 @@ export class Raymarcher {
 			show_vert: load_text('./src/show_buffer.vert.glsl'),
 		}
 
-		const cubemaps = ["lycksele", "yokohama"];
+		const cubemaps = ["lycksele", "yokohama", "interstellar"];
 		cubemaps.forEach((cubemap) => {
 			this.add_cubemap(this.resources, cubemap);
 		});
