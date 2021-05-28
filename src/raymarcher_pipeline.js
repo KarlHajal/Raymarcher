@@ -547,10 +547,10 @@ export class Raymarcher {
 		this.regl = regl
 
 		this.resources = {
-			raymarcher_frag: load_text('./src/raymarcher.frag.glsl'),
-			raymarcher_vert: load_text('./src/raymarcher.vert.glsl'),
-			show_frag: load_text('./src/show_buffer.frag.glsl'),
-			show_vert: load_text('./src/show_buffer.vert.glsl'),
+			raymarcher_frag: load_text('./src/shaders/raymarcher.frag.glsl'),
+			raymarcher_vert: load_text('./src/shaders/raymarcher.vert.glsl'),
+			show_frag: load_text('./src/shaders/show_buffer.frag.glsl'),
+			show_vert: load_text('./src/shaders/show_buffer.vert.glsl'),
 		}
 
 		const cubemaps = ["lycksele", "yokohama", "interstellar"];
