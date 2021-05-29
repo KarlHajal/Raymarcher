@@ -20,8 +20,6 @@ vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
 vec4 perm(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
 
-float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
-
 float noise(vec3 p)
 {
 	vec3 a = floor(p);
@@ -46,7 +44,7 @@ vec4 map( vec3 p )
 
     // clouds
 	float f;
-	vec3 q = p*.5                          - vec3(0.0,0.0,1.5)*current_time + vec3(sin(0.7*current_time),0,0);
+	vec3 q = p*.5 - vec3(0.0,0.0,1.5)*current_time + vec3(sin(0.7*current_time),0,0);
     f  = 0.50000*noise( q ); q = q*2.02 - vec3(0.0,0.0,0.0)*current_time;
     f += 0.25000*noise( q ); q = q*2.03 - vec3(0.0,0.0,0.0)*current_time;
     f += 0.12500*noise( q ); q = q*2.01 - vec3(0.0,0.0,0.0)*current_time;
@@ -104,15 +102,6 @@ vec3 raymarch( vec3 ro, vec3 rd )
 	}
 
 	vec4 bg = mix( vec4(.3,.4,.5,0), vec4(.5,.7,1,0), smoothstep(-.4,.0,rd.y) ); // sky/ocean
-
-	/*// floor
-	if ( rd.y < -.2 )
-	{
-		vec3 pos = ro + rd*(ro.y+1.0)/(-rd.y);
-		
-		float shadow = testshadow(pos+sunDir/sunDir.y, dither);
-		bg.xyz = mix( vec3(0), vec3(.5), shadow*.8+.2 );
-	}*/
 
 	sum += bg*(1.0 - sum.a);
 	
