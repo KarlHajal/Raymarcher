@@ -530,14 +530,14 @@ export class Raymarcher {
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_noise_frag, code_injections)
 
-		scene.cubemap = "interstellar";
+		/*scene.cubemap = "interstellar";
 		const cubemap = this.regl.cube(
 			this.resources_ready[scene.cubemap + '_posx'], this.resources_ready[scene.cubemap + '_negx'],
 			this.resources_ready[scene.cubemap + '_posy'], this.resources_ready[scene.cubemap + '_negy'],
 			this.resources_ready[scene.cubemap + '_posz'], this.resources_ready[scene.cubemap + '_negz']);
 
 		uniforms[`cubemap_texture`] = cubemap;
-
+*/
 		const pipeline_raymarcher = this.regl({
 			attributes: {
 				vertex_position: mesh_quad_2d.position,
@@ -648,7 +648,7 @@ export class Raymarcher {
 			this.noise_interval = setInterval(() => {
 				this.execute_pipeline(this.ray_marcher_pipeline_for_noise(scene_def))
 				this.noise_iteration += 1;
-			}, 100);
+			}, 1000/30);
 		}		
 		else if(scene_name !== this.scene_name || num_reflections !== this.num_reflections) {
 			if(this.noise_interval !== null){

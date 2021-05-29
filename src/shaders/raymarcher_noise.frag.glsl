@@ -3,7 +3,7 @@ precision highp float;
 varying vec3 v2f_ray_origin;
 varying vec3 v2f_ray_direction;
 
-uniform samplerCube cubemap_texture;
+//uniform samplerCube cubemap_texture;
 
 #define EPSILON 0.01
 #define MAX_ITERATIONS 256.0
@@ -15,6 +15,10 @@ const float tau = 6.28318530717958647692;
 #define GAMMA (2.2)
 
 uniform float current_time;
+
+vec3 sky_color(){
+	return vec3(0.7, 0.87, 0.98);
+}
 
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
@@ -201,8 +205,8 @@ vec3 ShadeOcean( vec3 pos, vec3 ray, vec2 fragCoord )
 	
 	vec3 reflectedRay = ray-2.0*norm*ndotr;
 	
-    vec3 reflection = textureCube(cubemap_texture, reflectedRay).xyz;
-	
+    //vec3 reflection = textureCube(cubemap_texture, reflectedRay).xyz;
+	vec3 reflection = sky_color();
 	vec3 col = vec3(0,.04,.04); // under-sea colour
 	col = mix( col, reflection, fresnel );
 	// foam
@@ -228,7 +232,8 @@ void main() {
         result = ShadeOcean( ray_origin+ray_direction*to, ray_direction, vec2(0., 1.0) );
     }
 	else{
-        result = textureCube(cubemap_texture, ray_direction).xyz;
+        //result = textureCube(cubemap_texture, ray_direction).xyz;
+		result = sky_color();
     }
 
     vec3 pix_color = ToGamma(result);
