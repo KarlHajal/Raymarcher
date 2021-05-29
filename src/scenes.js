@@ -498,7 +498,7 @@ SCENES.push({
 });
 
 SCENES.push({
-	name: '3D-Perlin-Noise',
+	name: 'Waves',
 	camera: {
 		position: [0, 1, 0], target: [0, 0.3, 1], up: [0, 1, 0], fov: 75,
 	},

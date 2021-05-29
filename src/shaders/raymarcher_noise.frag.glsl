@@ -24,7 +24,6 @@ vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
 vec4 perm(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
 
-float hash(float n) { return fract(sin(n) * 1e4); }
 float hash(vec2 p) { return fract(1e4 * sin(17.0 * p.x + p.y * 0.1) * (0.1 + abs(sin(p.y * 13.0 + p.x)))); }
 
 float noise(vec2 x) {
@@ -78,7 +77,7 @@ float fbm(vec3 x) {
 	return v;
 }
 
-float Waves( vec3 pos )
+float waves( vec3 pos )
 {
 	pos *= .2*vec3(1,1,1);
 	
@@ -100,7 +99,7 @@ float Waves( vec3 pos )
 	return (.5-f)*1.0;
 }
 
-float WavesDetail( vec3 pos )
+float detailed_waves( vec3 pos )
 {
 	pos *= .2*vec3(1,1,1);
 	
@@ -122,17 +121,16 @@ float WavesDetail( vec3 pos )
 	return (.5-f)*1.0;
 }
 
-float OceanDistanceField( vec3 pos )
+float waves_sdf( vec3 pos )
 {
-	return pos.y - Waves(pos);
+	return pos.y - waves(pos);
 }
 
-float OceanDistanceFieldDetail( vec3 pos )
-{
-	return pos.y - WavesDetail(pos);
+float detailed_waves_sdf(vec3 pos){
+	return pos.y - detailed_waves(pos);
 }
 
-float TraceOcean( vec3 pos, vec3 ray )
+float raymarch( vec3 pos, vec3 ray )
 {
 	float h = 1.0;
 	float t = 0.0;
@@ -140,7 +138,7 @@ float TraceOcean( vec3 pos, vec3 ray )
 	{
 		if ( h < .01 || t > 100.0 )
 			break;
-		h = OceanDistanceField( pos+t*ray );
+		h = waves_sdf( pos+t*ray );
 		t += h;
 	}
 	
@@ -150,19 +148,19 @@ float TraceOcean( vec3 pos, vec3 ray )
 	return t;
 }
 
-vec3 OceanNormal( vec3 pos )
+vec3 estimate_normal( vec3 pos )
 {
 	vec3 norm;
 	vec2 d = vec2(.01*length(pos),0);
 	
-	norm.x = OceanDistanceFieldDetail( pos+d.xyy )-OceanDistanceFieldDetail( pos-d.xyy );
-	norm.y = OceanDistanceFieldDetail( pos+d.yxy )-OceanDistanceFieldDetail( pos-d.yxy );
-	norm.z = OceanDistanceFieldDetail( pos+d.yyx )-OceanDistanceFieldDetail( pos-d.yyx );
+	norm.x = detailed_waves_sdf( pos+d.xyy )-detailed_waves_sdf( pos-d.xyy );
+	norm.y = detailed_waves_sdf( pos+d.yxy )-detailed_waves_sdf( pos-d.yxy );
+	norm.z = detailed_waves_sdf( pos+d.yyx )-detailed_waves_sdf( pos-d.yyx );
 
 	return normalize(norm);
 }
 
-float WaveCrests( vec3 ipos, vec2 fragCoord )
+float wave_crests( vec3 ipos, vec2 fragCoord )
 {
 	vec3 pos = ipos;
 	pos *= .2*vec3(1,1,1);
@@ -196,26 +194,25 @@ float WaveCrests( vec3 ipos, vec2 fragCoord )
 	return pow(smoothstep(.4,-.1,f),6.0);
 }
 
-vec3 ShadeOcean( vec3 pos, vec3 ray, vec2 fragCoord )
+vec3 compute_pixel_color( vec3 pos, vec3 ray, vec2 fragCoord )
 {
-	vec3 norm = OceanNormal(pos);
+	vec3 norm = estimate_normal(pos);
 	float ndotr = dot(ray,norm);
 
 	float fresnel = pow(1.0-abs(ndotr),5.0);
 	
-	vec3 reflectedRay = ray-2.0*norm*ndotr;
-	
+	//vec3 reflectedRay = ray-2.0*norm*ndotr;
     //vec3 reflection = textureCube(cubemap_texture, reflectedRay).xyz;
 	vec3 reflection = sky_color();
 	vec3 col = vec3(0,.04,.04); // under-sea colour
 	col = mix( col, reflection, fresnel );
 	// foam
-	col = mix( col, vec3(1), WaveCrests(pos,fragCoord) );
+	col = mix( col, vec3(1), wave_crests(pos,fragCoord) );
 	
 	return col;
 }
 
-vec3 ToGamma( vec3 col )
+vec3 to_gamma_color( vec3 col )
 {
 	// convert back into colour values, so the correct light will come out of the monitor
 	return pow( col, vec3(1.0/GAMMA) );
@@ -225,18 +222,18 @@ void main() {
 	vec3 ray_origin = v2f_ray_origin;
 	vec3 ray_direction = normalize(v2f_ray_direction);
 	
-    float to = TraceOcean( ray_origin, ray_direction );
+    float dist = raymarch( ray_origin, ray_direction );
 
     vec3 result;
-	if ( to > 0.0 ){
-        result = ShadeOcean( ray_origin+ray_direction*to, ray_direction, vec2(0., 1.0) );
+	if ( dist > 0.0 ){
+        result = compute_pixel_color( ray_origin+ray_direction*dist, ray_direction, ray_direction.xy );
     }
 	else{
         //result = textureCube(cubemap_texture, ray_direction).xyz;
 		result = sky_color();
     }
 
-    vec3 pix_color = ToGamma(result);
+    vec3 pix_color = to_gamma_color(result);
 
 	gl_FragColor = vec4(pix_color, 1.);
 }

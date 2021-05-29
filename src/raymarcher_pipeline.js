@@ -636,7 +636,7 @@ export class Raymarcher {
 			num_reflections = this.num_reflections
 		}
 
-		if(scene_name !== this.scene_name && scene_name === "3D-Perlin-Noise"){
+		if(scene_name !== this.scene_name && scene_name === "Waves"){
 			if(this.noise_interval !== null){
 				clearInterval(this.noise_interval);
 				this.noise_interval = null;
