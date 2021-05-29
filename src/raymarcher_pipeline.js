@@ -528,7 +528,8 @@ export class Raymarcher {
 
 		const code_injections = {};
 
-		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_noise_frag, code_injections)
+		const frag = scene.name === "Waves" ? this.resources_ready.raymarcher_waves_frag : this.resources_ready.raymarcher_clouds_frag
+		const shader_frag = this.shader_inject_defines(frag, code_injections)
 
 		/*scene.cubemap = "interstellar";
 		const cubemap = this.regl.cube(
@@ -568,7 +569,8 @@ export class Raymarcher {
 
 		this.resources = {
 			raymarcher_frag: load_text('./src/shaders/raymarcher.frag.glsl'),
-			raymarcher_noise_frag: load_text('./src/shaders/raymarcher_noise.frag.glsl'),
+			raymarcher_waves_frag: load_text('./src/shaders/raymarcher_waves.frag.glsl'),
+			raymarcher_clouds_frag: load_text('./src/shaders/raymarcher_clouds.frag.glsl'),
 			raymarcher_vert: load_text('./src/shaders/raymarcher.vert.glsl'),
 			show_frag: load_text('./src/shaders/show_buffer.frag.glsl'),
 			show_vert: load_text('./src/shaders/show_buffer.vert.glsl'),
@@ -636,7 +638,7 @@ export class Raymarcher {
 			num_reflections = this.num_reflections
 		}
 
-		if(scene_name !== this.scene_name && scene_name === "Waves"){
+		if(scene_name !== this.scene_name && (scene_name === "Waves" || scene_name === "Clouds")){
 			if(this.noise_interval !== null){
 				clearInterval(this.noise_interval);
 				this.noise_interval = null;

@@ -504,4 +504,11 @@ SCENES.push({
 	},
 });
 
+SCENES.push({
+	name: 'Clouds',
+	camera: {
+		position: [0, 5, 0], target: [5, 0, 5], up: [0, 1, 0], fov: 75,
+	},
+});
+
 export const SCENES_BY_NAME = Object.fromEntries(SCENES.map((sc) => [sc.name, sc]))
