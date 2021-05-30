@@ -11,10 +11,11 @@ varying vec3 v2f_ray_direction;
 
 const float tau = 6.28318530717958647692;
 
-// Gamma correction
 #define GAMMA (2.2)
 
 uniform float current_time;
+
+float time = current_time/30.;
 
 vec3 sky_color(){
 	return vec3(0.7, 0.87, 0.98);
@@ -65,69 +66,50 @@ float noise(vec3 p)
 	return o4.y * d.y + o4.x * (1.0 - d.y);
 }
 
-float fbm(vec3 x) {
-	float v = 0.0;
-	float a = 0.5;
-	vec3 shift = vec3(100);
-	for (int i = 0; i < 5; ++i) {
-		v += a * noise(x);
-		x = x * 2.0 + shift;
-		a *= 0.5;
-	}
-	return v;
+void waves_starting_pos(out vec3 pos){
+	pos = pos * .2*vec3(1) + (time)*vec3(0,.1,.1);
 }
 
-float waves( vec3 pos )
-{
-	pos *= .2*vec3(1,1,1);
-	
+void waves_noise_octave(out float f, out vec3 pos, float factor){
+	pos = (pos.yzx + pos.zyx*vec3(1,-1,1))/sqrt(2.0); 
+	f = f*factor+abs(noise(pos)-.5)*2.0;
+	pos *= 2.0;
+}
+
+float waves_result(float f, int octaves){
+	return (0.5 - f/exp2(float(octaves)));
+}
+
+float waves_5_octaves( vec3 pos ){
 	const int octaves = 5;
-	float f = 0.0;
-
-	// need to do the octaves from large to small, otherwise things don't line up
-	// (because I rotate by 45 degrees on each octave)
-	pos += ((current_time/10.))*vec3(0,.1,.1);
-	for ( int i=0; i < octaves; i++ )
-	{
-		pos = (pos.yzx + pos.zyx*vec3(1,-1,1))/sqrt(2.0);
-		//f  = f*2.0+abs(Noise(pos).x-.5)*2.0;
-        f  = f*2.0+abs(noise(pos)-.5)*2.0;
-		pos *= 2.0;
-	}
-	f /= exp2(float(octaves));
 	
-	return (.5-f)*1.0;
+	float f = 0.0;
+	waves_starting_pos(pos);
+	for (int i=0; i < octaves; ++i){
+        waves_noise_octave(f, pos, 2.);
+	}
+	return waves_result(f, octaves);
 }
 
-float detailed_waves( vec3 pos )
+float waves_8_octaves( vec3 pos )
 {
-	pos *= .2*vec3(1,1,1);
-	
 	const int octaves = 8;
+
 	float f = 0.0;
-
-	// need to do the octaves from large to small, otherwise things don't line up
-	// (because I rotate by 45 degrees on each octave)
-    pos += ((current_time/10.))*vec3(0,.1,.1);
-	for ( int i=0; i < octaves; i++ )
-	{
-		pos = (pos.yzx + pos.zyx*vec3(1,-1,1))/sqrt(2.0);
-		//f  = f*2.0+abs(NoisePrecise(pos).x-.5)*2.0;
-        f  = f*2.0+abs(noise(pos)-.5)*2.0;
-		pos *= 2.0;
+	waves_starting_pos(pos);
+	for (int i=0; i < octaves; ++i){
+        waves_noise_octave(f, pos, 2.);
 	}
-	f /= exp2(float(octaves));
-	
-	return (.5-f)*1.0;
+	return waves_result(f, octaves);
 }
 
-float waves_sdf( vec3 pos )
+float waves_5_sdf( vec3 pos )
 {
-	return pos.y - waves(pos);
+	return pos.y - waves_5_octaves(pos);
 }
 
-float detailed_waves_sdf(vec3 pos){
-	return pos.y - detailed_waves(pos);
+float waves_8_sdf(vec3 pos){
+	return pos.y - waves_8_octaves(pos);
 }
 
 float raymarch( vec3 pos, vec3 ray )
@@ -138,7 +120,7 @@ float raymarch( vec3 pos, vec3 ray )
 	{
 		if ( h < .01 || t > 100.0 )
 			break;
-		h = waves_sdf( pos+t*ray );
+		h = waves_5_sdf( pos+t*ray );
 		t += h;
 	}
 	
@@ -150,51 +132,44 @@ float raymarch( vec3 pos, vec3 ray )
 
 vec3 estimate_normal( vec3 pos )
 {
-	vec3 norm;
 	vec2 d = vec2(.01*length(pos),0);
-	
-	norm.x = detailed_waves_sdf( pos+d.xyy )-detailed_waves_sdf( pos-d.xyy );
-	norm.y = detailed_waves_sdf( pos+d.yxy )-detailed_waves_sdf( pos-d.yxy );
-	norm.z = detailed_waves_sdf( pos+d.yyx )-detailed_waves_sdf( pos-d.yyx );
+	vec3 normal = vec3(
+		waves_8_sdf( pos+d.xyy )-waves_8_sdf( pos-d.xyy ),
+	 	waves_8_sdf( pos+d.yxy )-waves_8_sdf( pos-d.yxy ),
+		waves_8_sdf( pos+d.yyx )-waves_8_sdf( pos-d.yyx )
+		);
 
-	return normalize(norm);
+	return normalize(normal);
 }
 
-float wave_crests( vec3 ipos, vec2 fragCoord )
+float wave_crests( vec3 pos, vec2 seed )
 {
-	vec3 pos = ipos;
-	pos *= .2*vec3(1,1,1);
-	
 	const int octaves1 = 6;
 	const int octaves2 = 16;
+	
 	float f = 0.0;
-
-	// need to do the octaves from large to small, otherwise things don't line up
-	// (because I rotate by 45 degrees on each octave)
-	pos += ((current_time/10.))*vec3(0,.1,.1);
+	waves_starting_pos(pos);
 	vec3 pos2 = pos;
 	for ( int i=0; i < octaves1; i++ )
 	{
-		pos = (pos.yzx + pos.zyx*vec3(1,-1,1))/sqrt(2.0);
-        f  = f*1.5+abs(noise(pos)-.5)*2.0;
-		pos *= 2.0;
+		waves_noise_octave(f, pos, 1.5);
 	}
+
 	pos = pos2 * exp2(float(octaves1));
-	pos.y = -.05*((current_time/10.));
+	pos.y = - 0.05 * time;
+
 	for ( int i=octaves1; i < octaves2; i++ )
 	{
-		pos = (pos.yzx + pos.zyx*vec3(1,-1,1))/sqrt(2.0);
-		f  = f*1.5+pow(abs(noise(pos)-.5)*2.0,1.0);
-		pos *= 2.0;
+		waves_noise_octave(f, pos, 1.5);
 	}
+
 	f /= 1500.0;
-	
-	f -= noise(vec2(fragCoord.xy))*.01;
+	f -= noise(seed)*.01;
 	
 	return pow(smoothstep(.4,-.1,f),6.0);
 }
 
-vec3 compute_pixel_color( vec3 pos, vec3 ray, vec2 fragCoord )
+vec3 compute_pixel_color( vec3 pos, vec3 ray, vec2 seed )
 {
 	vec3 norm = estimate_normal(pos);
 	float ndotr = dot(ray,norm);
@@ -207,7 +182,7 @@ vec3 compute_pixel_color( vec3 pos, vec3 ray, vec2 fragCoord )
 	vec3 col = vec3(0,.04,.04); // under-sea colour
 	col = mix( col, reflection, fresnel );
 	// foam
-	col = mix( col, vec3(1), wave_crests(pos,fragCoord) );
+	col = mix( col, vec3(1), wave_crests(pos,seed) );
 	
 	return col;
 }
