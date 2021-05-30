@@ -942,8 +942,8 @@ vec3 estimate_normal(vec3 p ) // Tetrahedron technique
 }
 
 
-float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, float start, float end, out int material_id) {
-    float depth = start;
+float raymarch(vec3 ray_origin, vec3 marching_direction, out int material_id) {
+    float depth = MIN_DISTANCE;
     for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
 
         float dist = scene_sdf(ray_origin + depth * marching_direction, material_id);
@@ -954,11 +954,11 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
         
 		depth += dist;
         
-		if (depth >= end) {
-            return end;
+		if (depth > MAX_DISTANCE) {
+            return MAX_DISTANCE;
         }
     }
-    return end;
+    return MAX_DISTANCE;
 }
 
 float calculate_soft_shadow(vec3 sample_point, Light light){
@@ -988,7 +988,7 @@ bool is_shadow(vec3 sample_point, Light light){
     vec3 L = normalize(light.position - sample_point);
 	vec3 displaced_origin = sample_point + L * 0.1;
 	int temp_id;
-	float dist = shortest_distance_to_surface(displaced_origin, L, MIN_DISTANCE, MAX_DISTANCE, temp_id);
+	float dist = raymarch(displaced_origin, L, temp_id);
 	return dist < length(light.position - displaced_origin);
 }
 
@@ -1061,7 +1061,7 @@ float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 	for(int i = 0; i < NUM_AMBIENT_OCCLUSION_SAMPLES; ++i){
 		vec3 random_direction = get_random_hemisphere_ray_direction(normal, float(i));
 		vec3 displaced_origin = sample_point + random_direction * 0.1;
-		float dist = shortest_distance_to_surface(displaced_origin, random_direction, MIN_DISTANCE, MAX_DISTANCE, temp_id);
+		float dist = raymarch(displaced_origin, random_direction, temp_id);
 		if(dist < MAX_DISTANCE){
 			intersections += 1;
 		}
@@ -1106,7 +1106,7 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 
 		float start = MIN_DISTANCE;
 		float end = MAX_DISTANCE;
-		float dist = shortest_distance_to_surface(ray_origin, ray_direction, start, end, material_id);
+		float dist = raymarch(ray_origin, ray_direction, material_id);
 
 		if (dist > end - EPSILON) { // No collision
 			#if ENVIRONMENT_MAPPING != 0
