@@ -13,6 +13,9 @@ precision highp float;
 //#define ENVIRONMENT_MAPPING
 uniform samplerCube cubemap_texture;
 
+//#define SOFT_SHADOWS
+uniform float soft_shadows_factor;
+
 const int SPHERE_ID = 1;
 const int PLANE_ID = 2;
 const int CYLINDER_ID = 3;
@@ -958,7 +961,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     return end;
 }
 
-/*float calculate_soft_shadow(vec3 sample_point, Light light, float factor){
+float calculate_soft_shadow(vec3 sample_point, Light light){
 	vec3 L = normalize(light.position - sample_point);
 	vec3 displaced_origin = sample_point + L * 0.1;
 	int temp_id;
@@ -969,7 +972,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
 
         float dist = scene_sdf(displaced_origin + depth * L, temp_id);
         
-		res = min( res, factor*dist/depth );
+		res = min( res, soft_shadows_factor*dist/depth );
         
 		depth += dist;
         
@@ -979,7 +982,7 @@ float shortest_distance_to_surface(vec3 ray_origin, vec3 marching_direction, flo
     }
 	res = clamp( res, 0.0, 1.0 );
     return res*res*(3.0-2.0*res);
-}*/
+}
 
 bool is_shadow(vec3 sample_point, Light light){
     vec3 L = normalize(light.position - sample_point);
@@ -991,9 +994,11 @@ bool is_shadow(vec3 sample_point, Light light){
 
 vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light light, Material material) {
 
+	#if !SOFT_SHADOWS
 	if(is_shadow(sample_point, light)){
 		return vec3(0.);
 	}
+	#endif
 
     vec3 L = normalize(light.position - sample_point);
     float dotLN = dot(L, normal);
@@ -1006,9 +1011,12 @@ vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light li
     vec3 R = normalize(reflect(-L, normal));
     float dotRV = dot(R, V);
 	
-	//float soft_shadow = calculate_soft_shadow(sample_point, light, 128.0);
-	//vec3 color = material.color * light.color * material.diffuse * dotLN * soft_shadow;
+	
 	vec3 color = material.color * light.color * material.diffuse * dotLN;
+
+	#if SOFT_SHADOWS
+	color *= calculate_soft_shadow(sample_point, light);
+	#endif
 
     if (dotRV > 0.) {
         color += material.color * light.color * material.specular * pow(dotRV, material.shininess);

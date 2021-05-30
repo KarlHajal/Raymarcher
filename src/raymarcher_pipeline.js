@@ -481,7 +481,6 @@ export class Raymarcher {
 			uniforms[`lights[${idx}].color`] = li.color
 		})
 		code_injections['NUM_LIGHTS'] = lights.length.toFixed(0)
-		
 
 		this.process_primitives(scene, uniforms, material_id_by_name, code_injections);
 		this.process_combinations(scene, uniforms, material_id_by_name, code_injections);
@@ -499,6 +498,13 @@ export class Raymarcher {
 			code_injections['ENVIRONMENT_MAPPING'] = "0";
 		}
 
+		if(scene.soft_shadows_factor){
+			code_injections['SOFT_SHADOWS'] = "1";
+			uniforms[`soft_shadows_factor`] = scene.soft_shadows_factor;
+		}
+		else{
+			code_injections['SOFT_SHADOWS'] = "0";
+		}
 
 		const shader_frag = this.shader_inject_defines(this.resources_ready.raymarcher_frag, code_injections)
 		

@@ -347,6 +347,7 @@ SCENES.push({
 		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
 		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
 	],
+	soft_shadows_factor: 20.0,
 	primitives: {
 		planes: [
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
