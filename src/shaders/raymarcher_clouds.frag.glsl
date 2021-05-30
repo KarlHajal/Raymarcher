@@ -6,15 +6,17 @@ varying vec3 v2f_ray_direction;
 //uniform samplerCube cubemap_texture;
 
 #define EPSILON 0.01
-#define MAX_ITERATIONS 256.0
+#define MAX_ITERATIONS 100
 #define FAR_PLANE 100.0
-
-const float tau = 6.28318530717958647692;
 
 // Gamma correction
 #define GAMMA 2.2
 
 uniform float current_time;
+
+float time = current_time/20.;
+
+const vec3 sunDir = vec3(-1,.2,-1);
 
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
@@ -44,11 +46,11 @@ vec4 map( vec3 p )
 
     // clouds
 	float f;
-	vec3 q = p*.5 - vec3(0.0,0.0,1.5)*current_time + vec3(sin(0.7*current_time),0,0);
-    f  = 0.50000*noise( q ); q = q*2.02 - vec3(0.0,0.0,0.0)*current_time;
-    f += 0.25000*noise( q ); q = q*2.03 - vec3(0.0,0.0,0.0)*current_time;
-    f += 0.12500*noise( q ); q = q*2.01 - vec3(0.0,0.0,0.0)*current_time;
-    f += 0.06250*noise( q ); q = q*2.02 - vec3(0.0,0.0,0.0)*current_time;
+	vec3 q = p*.5 - vec3(0.0,0.0,1.5)*time + vec3(sin(0.7*time),0,0);
+    f  = 0.50000*noise( q ); q = q*2.02 - vec3(0.0,0.0,0.0)*time;
+    f += 0.25000*noise( q ); q = q*2.03 - vec3(0.0,0.0,0.0)*time;
+    f += 0.12500*noise( q ); q = q*2.01 - vec3(0.0,0.0,0.0)*time;
+    f += 0.06250*noise( q ); q = q*2.02 - vec3(0.0,0.0,0.0)*time;
     f += 0.03125*noise( q );
 
 	den = clamp( den + 4.0*f, 0.0, 1.0 );
@@ -57,8 +59,6 @@ vec4 map( vec3 p )
 	
 	return vec4( col, den*.7 );
 }
-
-const vec3 sunDir = vec3(-1,.2,-1);
 
 float testshadow( vec3 p, float dither )
 {
