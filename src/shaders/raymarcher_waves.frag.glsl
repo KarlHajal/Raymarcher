@@ -6,7 +6,7 @@ varying vec3 v2f_ray_direction;
 //uniform samplerCube cubemap_texture;
 
 #define EPSILON 0.01
-#define MAX_ITERATIONS 256.0
+#define MAX_ITERATIONS 100
 #define FAR_PLANE 100.0
 
 #define GAMMA (2.2)
@@ -113,20 +113,23 @@ float waves_8_sdf(vec3 pos){
 }
 
 float raymarch( vec3 pos, vec3 ray ){
-	float h = 1.0;
-	float t = 0.0;
-	for ( int i=0; i < 100; i++ )	{
-		if ( h < .01 || t > 100.0 )
-			break;
-		h = waves_5_sdf( pos+t*ray );
-		t += h;
+	float dist = 1.0;
+	float depth = 0.0;
+	for (int i=0; i < MAX_ITERATIONS; ++i)	{
+		dist = waves_5_sdf( pos+depth*ray );
+
+		if(dist < EPSILON){
+			return depth;
+		}
+
+		depth += dist;
+
+		if(depth > FAR_PLANE){
+			return 0.0;
+		}
 	}
 	
-	if ( h > .1 ){
-		return 0.0;
-	}
-	
-	return t;
+	return 0.0;
 }
 
 vec3 estimate_normal( vec3 pos ){
