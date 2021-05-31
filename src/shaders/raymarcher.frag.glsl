@@ -1025,8 +1025,7 @@ vec3 phong_light_contribution(vec3 sample_point, vec3 eye, vec3 normal, Light li
     return color;
 }
 
-float random(vec2 co)
-{
+float random(vec2 co){
     float a = 12.9898;
     float b = 78.233;
     float c = 43758.5453;
@@ -1036,16 +1035,16 @@ float random(vec2 co)
 }
 
 vec3 get_random_hemisphere_ray_direction(vec3 normal, float seed){
-	// Radians [0, 2*PI]
+	// radians [0, 2*PI]
 	float r1 = 2. * PI * random(vec2(seed,seed+32.));
-    // Radians [0, PI/2]
+    // radians [0, PI/2]
 	float r2 = PI * random(vec2(seed+12., seed+684.2)) / 2.;
 
 	float x = cos(r1) * sin(r2);
     float y = sin(r1) * sin(r2);
     float z = cos(r2);
 
-    // Gram Schmidt orthogonalization
+    // Gram-Schmidt Orthogonalization
     vec3 unit_x = vec3(1.0, 1.0, 1.0);
     vec3 w = normal;
     vec3 u = normalize(cross(normalize(unit_x), w));
@@ -1070,7 +1069,7 @@ float ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 	return float(intersections) / float(NUM_AMBIENT_OCCLUSION_SAMPLES);
 }
 
-float ambient_occlusion_contribution2(vec3 sample_point, vec3 normal){
+float fake_ambient_occlusion_contribution(vec3 sample_point, vec3 normal){
 	int temp_id;
 	float occ = 0.0;
     float sca = 1.0;
