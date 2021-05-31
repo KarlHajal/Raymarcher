@@ -153,10 +153,11 @@ SCENES.push({
 });
 
 SCENES.push({
-	name: 'Box - Triangles - Box Frame - Cones - Hexagonal - Triangular - Ellipse - Pyramid - OctaHedron',
+	name: 'Primitives',
 	camera: {
 		position: [4.8, 6.4, 13], target: [1, 0, 3], up: [0, 1, 0], fov: 65,
 	},
+	soft_shadows_factor: 20.0,
 	materials: [
 		{name: 'floor', color: [1., 1., 1.], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.5},
 		{name: 'white', color: [0.9, 0.8, 0.8],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
@@ -166,6 +167,7 @@ SCENES.push({
 		{name: 'color4', color: [0.6, 0.2, 0.6],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
 		{name: 'color5', color: [0.4, 0.5, 0.2],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
 		{name: 'color6', color: [0.7, 0.8, 0.6],ambient: 0.7, diffuse: 0.7, specular: 0.4, shininess: 6., mirror: 0.4},
+		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.}
 		],
 	lights: [
 		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
@@ -177,7 +179,7 @@ SCENES.push({
 			{center: [2, 0.1, 2], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0, is_frame:1, material: 'white'},
 			//{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius:0, is_frame:0, material: 'color1'},
 			//{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0, is_frame:0, material: 'color4'},
-			//{center: [0, -3, 0.4], length: 2, width: 3, height: 4, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, is_frame:0, material: 'white'},
+			{center: [0, 0.4, -3], length: 2, width: 3, height: 4, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius:0.2, is_frame:0, material: 'mirror'},
 			//{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'color2'},
 			{center: [-3, 2, -3], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius:0.1, is_frame:1, material: 'color4'},
 		],
