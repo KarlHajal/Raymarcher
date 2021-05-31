@@ -70,7 +70,7 @@ async function main() {
 		canvas: elem_canvas,
 		
 		// tweak that if the quality is bad https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/MediaRecorder
-		videoBitsPerSecond: 15*1024*1024,
+		videoBitsPerSecond: 50*1024*1024,
 	});
 
 	function video_start_stop() {
