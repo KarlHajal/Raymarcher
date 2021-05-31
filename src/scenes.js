@@ -215,28 +215,29 @@ SCENES.push({
 SCENES.push({
 	name: 'Box',
 	camera: {
-		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+		position: [-1, 3, 10], target: [-1, 0, 3], up: [0, 1, 0], fov: 65,
 	},
 	materials: [
-		{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+		{name: 'floor', color: [1., 1., 1.], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.5},
 		{name: 'white', color: [0.9, 0.9, 0.9],ambient: 0.4, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
 	],
+	cubemap: "lycksele",
 	lights: [
-		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
-		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
+		{position: [2.5, 4, 2.5], color: [0.5, 0.8, 1.0]},
+		{position: [0.5, -0.1, -2.5], color: [0.5, 0.8, 1.0]},
 	],
 	soft_shadows_factor: 20.0,
 	primitives: {
 		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+			{center: [0, -2, 0], normal: [0, 1, 0], material: 'floor'},
 		],
 		boxes: [
-			{center: [2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
-			{center: [-2, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
-			{center: [0, 2, 0.1], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0, is_frame:0, material: 'white'},
-			{center: [0, -3, 0.1], length: 2, width: 3, height: 5, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.2, is_frame:0, material: 'white'},
-			{center: [3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
-			{center: [-3, -3, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
+			{center: [2, 0.1, 2], length: 1, width: 1, height: 1, rotation_x: 40, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [-2, 0.1, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 40, rotation_z: 0, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [0, 0.1, 2], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0, is_frame:0, material: 'white'},
+			{center: [0, 0.1, -3], length: 2, width: 5, height: 3, rotation_x: 0, rotation_y: 0, rotation_z: 0, rounded_edges_radius: 0.2, is_frame:0, material: 'white'},
+			{center: [3, 2, -3], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: -40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
+			{center: [-3, 2, -3], length: 1, width: 1, height: 1, rotation_x: 0, rotation_y: 0, rotation_z: 40, rounded_edges_radius: 0.3, is_frame:0, material: 'white'},
 		]
 	}
 });
