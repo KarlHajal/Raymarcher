@@ -6,7 +6,7 @@ varying vec3 v2f_ray_direction;
 //uniform samplerCube cubemap_texture;
 
 #define EPSILON 0.01
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 65
 #define MAX_DISTANCE 100.0
 
 // Gamma correction
@@ -93,7 +93,7 @@ vec3 raymarch( vec3 ro, vec3 rd ){
 	float dither = noise(rd);
 	t += 0.1*dither;
 	
-	for(int i = 0; i < 65; ++i){
+	for(int i = 0; i < MAX_ITERATIONS; ++i){
 		if(sum.a > 0.99) {
 			continue;
 		}
