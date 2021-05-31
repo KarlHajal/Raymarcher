@@ -7,7 +7,7 @@ varying vec3 v2f_ray_direction;
 
 #define EPSILON 0.01
 #define MAX_ITERATIONS 100
-#define FAR_PLANE 100.0
+#define MAX_DISTANCE 100.0
 
 // Gamma correction
 #define GAMMA 2.2
