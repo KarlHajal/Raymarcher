@@ -117,42 +117,43 @@ SCENES.push({
 SCENES.push({
 	name: 'Spheres + Cylinders + Capsules',
 	camera: {
-		position: [1, 10, 3], target: [1, 3, 0], up: [0, 0, 1], fov: 65,
+		position: [1, 3, 10], target: [1, 0, 3], up: [0, 1, 0], fov: 65,
 	},
 	materials: [
-		{name: 'floor', color: [0., 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
+		{name: 'floor', color: [1., 1., 1.], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.8},
 		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.3, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
 		{name: 'green', color: [0.48, 0.68, 0.28], ambient: 0.3, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
+		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.}
 	],
 	lights: [
-		{position: [2.5, 2.5, 4], color: [0.5, 0.8, 1.0]},
-		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
+		{position: [2.5, 4, 2.5], color: [0.5, 0.8, 1.0]},
+		{position: [0.5, -0.1, -2.5], color: [0.5, 0.8, 1.0]},
 	],
+	cubemap: "yokohama",
 	primitives: {
 		spheres: [
-			{center: [0, 2, 0.1], radius: 0.5, material: 'white'},
-			{center: [0, 3, 0.1], radius: 0.5, material: 'white'},
-			{center: [0, 4, 0.1], radius: 0.5, material: 'white'},
-			{center: [1, 2, 0.1], radius: 0.5, material: 'white'},
-			{center: [1, 3, 0.1], radius: 0.5, material: 'white'},
-			{center: [1, 4, 0.1], radius: 0.5, material: 'white'},
-			{center: [2, 2, 0.1], radius: 0.5, material: 'white'},
-			{center: [2, 3, 0.1], radius: 0.5, material: 'white'},
-			{center: [2, 4, 0.1], radius: 0.5, material: 'white'},
-			{center: [0.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-			{center: [0.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-			{center: [1.5, 3.5, 0.6], radius: 0.5, material: 'white'},
-			{center: [1.5, 2.5, 0.6], radius: 0.5, material: 'white'},
-			{center: [1, 3, 1.1], radius: 0.5, material: 'green'},
+			{center: [0, 0.1, 2], radius: 0.5, material: 'white'},
+			{center: [0, 0.1, 3], radius: 0.5, material: 'white'},
+			{center: [0, 0.1, 4], radius: 0.5, material: 'white'},
+			{center: [1, 0.1, 2], radius: 0.5, material: 'white'},
+			{center: [1, 0.1, 3], radius: 0.5, material: 'white'},
+			{center: [1, 0.1, 4], radius: 0.5, material: 'white'},
+			{center: [2, 0.1, 2], radius: 0.5, material: 'white'},
+			{center: [2, 0.1, 3], radius: 0.5, material: 'white'},
+			{center: [2, 0.1, 4], radius: 0.5, material: 'white'},
+			{center: [0.5, 0.6, 3.5], radius: 0.5, material: 'white'},
+			{center: [0.5, 0.6, 2.5], radius: 0.5, material: 'white'},
+			{center: [1.5, 0.6, 3.5], radius: 0.5, material: 'white'},
+			{center: [1.5, 0.6, 2.5], radius: 0.5, material: 'white'},
+			{center: [1, 1.1, 3], radius: 0.5, material: 'green'},
 		],
 		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
+			{center: [0, -1, 0], normal: [0, 1, 0], material: 'floor'},
 		],
 		cylinders: [
-			{center: [2.7, 3, 0.5], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
-			{center: [3., 3, 0.95], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 1, material: 'white'},
-			{center: [3.3, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
-			{center: [-2, 3, 1.4], radius: 0.3, height: 3, axis: [0, 1, 1], is_capsule: 1, material: 'white'},
+			{center: [-0.7, 0.5, 3], radius: 0.3, height: 3, axis: [0, 0, 1], is_capsule: 0, material: 'white'},
+			{center: [-1., 0.95, 3], radius: 0.3, height: 3, axis: [0, 0, 1], is_capsule: 1, material: 'white'},
+			{center: [-1.3, 1.4, 3], radius: 0.3, height: 3, axis: [0, 0, 1], is_capsule: 0, material: 'white'},
 		]
 	}
 });
