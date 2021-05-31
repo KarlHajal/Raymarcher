@@ -60,7 +60,7 @@ async function main() {
 		raymarcher.save_image()
 	})
 
-	init_menu(raymarcher, 'primitives')
+	init_menu(raymarcher, 'Box')
 }
 
 async function entrypoint() {

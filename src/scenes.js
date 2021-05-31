@@ -3,94 +3,7 @@
 export const SCENES = [];
 
 SCENES.push({
-	name: "primitives",
-	camera: {
-		position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
-	},
-	materials: [
-		{name: 'green', color: [0.3, 1., 0.4], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.},
-		{name: 'black', color: [0.3, 0.3, 0.3], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 1., mirror: 0.},
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.6, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.},
-	],
-	lights: [
-		{position: [3., 0, -0.5], color: [1.0, 0.4, 0.2]},
-		{position: [-3., -0.8, 3], color: [0.2, 0.4, 0.9]},
-	],
-	primitives:{
-		spheres: [
-			{center: [0.0, 0.0, 2.0], radius: 1.0, material: 'white'},
-			{center: [0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
-			{center: [-0.3, 0.5, 1.5], radius: 0.45, material: 'black'},
-			{center: [0., -0.1, 1.0], radius: 0.2, material: 'black'},
-		],
-		planes: [
-			{center: [0.0, 1., 0.], normal: [0., -1., 0.], material: 'white'}, // top
-			{center: [0.0, -1., 0.], normal: [0., 1., 0.], material: 'mirror'}, // bottom
-		],
-		cylinders: [
-			{center: [0.0, -0.75, 1.5], radius: 0.5, height: 0.2, axis: [0., 1., 0.], is_capsule: 0, material: 'green'},
-		]
-	}
-});
-	
-SCENES.push({
-	name: 'shading-example',
-	camera: {
-		position: [0, -4, 0], target: [0, 0, 0], up: [0, 0, 1], fov: 70,
-	},
-	lights: [
-		{position: [0, 0, 0], color: [1.0, 0.9, 0.5]},
-	],
-	materials: [
-		{name: 'floor', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 2., mirror: 0.0},
-		{name: 'shiny', color: [0.9, 0.3, 0.1], ambient: 0.1, diffuse: 0.3, specular: 0.9, shininess: 10., mirror: 0.2},
-	],
-	primitives: {
-		spheres: [
-			{center: [2, 0, 0.1], radius: 0.6, material: 'white'},
-			{center: [-2, 0, 0.1], radius: 0.6, material: 'shiny'},
-		],
-		cylinders: [
-			{center: [2, 0, 2], axis: [1, 0, 0], radius: 0.5, height: 4, is_capsule: 0, material: 'shiny'},
-			{center: [-2, 0, 2], axis: [1, 0, 0], radius: 0.6, height: 4, is_capsule: 0, material: 'white'},
-		],
-		planes: [
-			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		]
-	}
-})
-
-SCENES.push({
-	name: 'shadows-example',
-	camera: {
-		position: [0, -8, 6], target: [0, 0, 0], up: [0, 0, 1], fov: 70,
-	},
-	lights: [
-		{position: [0, 1, 2], color: [0.0, 0.7, 0.9]},
-		{position: [20, -3, 0], color: [1, 0.2, 0.1]},
-	],
-	materials: [
-		{name: 'floor', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.5, specular: 0.4, shininess: 4., mirror: 0.4},
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 2., mirror: 0.0},
-		{name: 'shiny', color: [0.9, 0.3, 0.1], ambient: 0.1, diffuse: 0.3, specular: 0.9, shininess: 10., mirror: 0.2},
-	],
-	primitives: {
-		cylinders: [0, 1, 2, 3, 4, 5, 6, 7].map((i) => { 
-			const a = i * Math.PI * 2 / 8 + 0.123
-			const r = 3
-			return { center: [r*Math.cos(a), r*Math.sin(a), 0], axis: [0, 0, 1], radius: 0.25, height: 4, is_capsule: 0, material: 'shiny' }
-		}),
-		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		]
-	}
-})
-
-SCENES.push({
-	name: 'shading1',
+	name: 'Shading',
 	camera: {
 		position: [0, -4, 0], target: [0, 0, 0], up: [0, 0, 1], fov: 70,
 	},
@@ -110,40 +23,6 @@ SCENES.push({
 		planes: [
 			{center: [0, 4, 0], normal: [0, -1, 0], material: 'white'},
 			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		]
-	}
-})
-
-SCENES.push({
-	name: 'mirror1',
-	camera: {
-		position: [0.5, -2, 0.4], target: [0.5, 0, 0.4], up: [0, 0, 1], fov: 65,
-	},
-	materials: [
-		{name: 'floor', color: [0.9, 0.9, 0.9], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.2},
-		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.2, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
-		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 1.0, shininess: 8., mirror: 0.9},
-		{name: 'particleR', color: [0.9, 0.3, 0.1], ambient: 0.2, diffuse: 0.5, specular: 0.9, shininess: 10., mirror: 0.1},
-		{name: 'particleB', color: [0.1, 0.3, 0.9], ambient: 0.2, diffuse: 0.5, specular: 0.9, shininess: 10., mirror: 0.1},
-
-	],
-	lights: [
-		{position: [2.5, 2.5, 4], color: [1.0, 0.8, 0.5]},
-		{position: [0.5, -2.5, -0.1], color: [0.5, 0.8, 1.0]},
-	],
-	primitives:{
-		spheres: [
-			{center: [2, 2, 0.1], radius: 0.5, material: 'particleR'},
-			{center: [2, 4, 0.1], radius: 0.5, material: 'particleB'},
-			{center: [2, 4, 2.1], radius: 0.5, material: 'particleR'},
-		],
-		planes: [
-			{center: [0, 0, -1], normal: [0, 0, 1], material: 'floor'},
-		],
-		cylinders: [
-			{center: [-2, 4, 0.0], radius: 2, height: 4, axis: [0, 0, 1], is_capsule: 0, material: 'mirror'},
-			{center: [2, 3, 0.1], radius: 0.1, height: 2, axis: [0, 1, 0], is_capsule: 0, material: 'white'},
-			{center: [2, 4, 1.1], radius: 0.1, height: 2, axis: [0, 0, 1], is_capsule: 0, material: 'white'},
 		]
 	}
 });
