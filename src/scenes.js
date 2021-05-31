@@ -30,7 +30,7 @@ SCENES.push({
 SCENES.push({
 	name: "Environment-Mapping",
 	camera: {
-		position: [0, 1.5, -3], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+		position: [0, 1.5, -3], target: [0, 0, 2], up: [0, 1, 0], fov: 75,
 	},
 	materials: [
 		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.},
@@ -50,7 +50,7 @@ SCENES.push({
 SCENES.push({
 	name: "Environment-Mapping-2",
 	camera: {
-		position: [0, 1.5, -3], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+		position: [0, 1.5, -3], target: [0, 0, 2.0], up: [0, 1, 0], fov: 75,
 	},
 	materials: [
 		{name: 'mirror', color: [0.9, 0.9, 0.9], ambient: 0., diffuse: 0., specular: 0., shininess: 0., mirror: 1.},

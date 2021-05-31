@@ -681,7 +681,16 @@ export class Raymarcher {
 
 			this.scene_name = scene_name
 			this.num_reflections = num_reflections
-			this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
+			const camera = scene_def.camera;
+			this.noise_interval = setInterval(() => {
+				if(camera.up[1] === 1){
+					vec3.rotateY(camera.position, camera.position, camera.target, toRadian(2));
+				}
+				else{
+					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(2));
+				}
+				this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
+			}, 1000/30);
 		}
 	}
 
