@@ -1,6 +1,7 @@
 
 function scene_chooser(elem, raymarcher, initial_scene, video) {
 
+	const videoz = video;
 	const buttons = {}
 
 	function update() {
@@ -12,9 +13,9 @@ function scene_chooser(elem, raymarcher, initial_scene, video) {
 		document.location.hash = raymarcher.scene_name
 	}
 
-	function set_scene(sc_name, video) {
+	function set_scene(sc_name) {
 		if(sc_name != raymarcher.scene_name) {
-			raymarcher.draw_scene({scene_name: sc_name}, video)
+			raymarcher.draw_scene({scene_name: sc_name}, videoz)
 			update()
 		}
 	}
@@ -47,8 +48,9 @@ function scene_chooser(elem, raymarcher, initial_scene, video) {
 	}
 }
 
-function reflection_chooser(elem, raymarcher) {
+function reflection_chooser(elem, raymarcher, video) {
 
+	const videoz = video;
 	const buttons = []
 
 	function update() {
@@ -63,7 +65,7 @@ function reflection_chooser(elem, raymarcher) {
 			raymarcher.draw_scene({
 				scene_name: raymarcher.scene_name,
 				num_reflections: num_reflections,
-			})
+			}, videoz)
 			update()
 		}
 	}
@@ -86,5 +88,5 @@ export function init_menu(raymarcher, initial_scene, video) {
 	scene_chooser(elem_scenes, raymarcher, initial_scene, video)
 
 	const elem_reflections = document.querySelector('#menu-reflections')
-	reflection_chooser(elem_reflections, raymarcher)
+	reflection_chooser(elem_reflections, raymarcher, video)
 }

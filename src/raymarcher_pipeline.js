@@ -671,9 +671,7 @@ export class Raymarcher {
 			this.noise_interval = setInterval(() => {
 				this.execute_pipeline(this.ray_marcher_pipeline_for_noise(scene_def))
 				this.noise_iteration += 1;
-				if(video.is_recording()){
-					video.push_frame();
-				}
+				video.push_frame();
 			}, 1000/30);
 		}		
 		else if(scene_name !== this.scene_name || num_reflections !== this.num_reflections) {
@@ -693,9 +691,7 @@ export class Raymarcher {
 					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(1));
 				}
 				this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
-				if(video.is_recording()){
-					video.push_frame();
-				}
+				video.push_frame();
 			}, 1000/30);
 		}
 	}
