@@ -75,7 +75,7 @@ vec4 map( vec3 p ){
 float testshadow( vec3 p, float dither ){
 	float shadow = 1.0;
 	float s = 0.0; // this causes a problem in chrome: .05*dither;
-	for ( int j=0; j < 5; j++ )
+	for (int j = 0; j < 5; ++j)
 	{
 		vec3 shadpos = p + s*sun_direction;
 		shadow = shadow - map(shadpos).a*shadow;
@@ -86,17 +86,17 @@ float testshadow( vec3 p, float dither ){
 }
 
 vec3 raymarch( vec3 ro, vec3 rd ){
-	vec4 sum = vec4( 0 );
+	vec4 sum = vec4(0);
 	
 	float t = 0.0;
 
-    // dithering	
 	float dither = noise(rd);
 	t += 0.1*dither;
 	
-	for( int i=0; i<65; i++ )
-	{
-		if( sum.a > 0.99 ) continue;
+	for(int i = 0; i < 65; ++i){
+		if(sum.a > 0.99) {
+			continue;
+		}
 		
 		vec3 pos = ro + (t+.2*t*t)*rd;
 		vec4 col = map( pos );
@@ -115,14 +115,14 @@ vec3 raymarch( vec3 ro, vec3 rd ){
 
 	sum += bg*(1.0 - sum.a);
 	
-	return clamp( sum.xyz, 0.0, 1.0 );
+	return clamp(sum.xyz, 0.0, 1.0);
 }
 
 void main() {
 	vec3 ray_origin = v2f_ray_origin;
 	vec3 ray_direction = normalize(v2f_ray_direction);
 	
-	vec3 pix_color = raymarch( ray_origin, ray_direction );
+	vec3 pix_color = raymarch(ray_origin, ray_direction);
 
 	gl_FragColor = vec4(to_gamma_color(pix_color), 1.);
 }
