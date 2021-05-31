@@ -87,7 +87,7 @@ vec3 compute_pixel_color(vec3 origin, vec3 ray, vec2 uv)
         depth += d;
         if (depth > FAR_PLANE) { break; }
     }
-    return color;
+    return 0.6 * background_color;
 }
 
 void main() {
