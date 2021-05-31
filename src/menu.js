@@ -1,5 +1,5 @@
 
-function scene_chooser(elem, raymarcher, initial_scene) {
+function scene_chooser(elem, raymarcher, initial_scene, video) {
 
 	const buttons = {}
 
@@ -12,9 +12,9 @@ function scene_chooser(elem, raymarcher, initial_scene) {
 		document.location.hash = raymarcher.scene_name
 	}
 
-	function set_scene(sc_name) {
+	function set_scene(sc_name, video) {
 		if(sc_name != raymarcher.scene_name) {
-			raymarcher.draw_scene({scene_name: sc_name})
+			raymarcher.draw_scene({scene_name: sc_name}, video)
 			update()
 		}
 	}
@@ -81,9 +81,9 @@ function reflection_chooser(elem, raymarcher) {
 	update()
 }
 
-export function init_menu(raymarcher, initial_scene) {
+export function init_menu(raymarcher, initial_scene, video) {
 	const elem_scenes = document.querySelector('#menu-scenes')
-	scene_chooser(elem_scenes, raymarcher, initial_scene)
+	scene_chooser(elem_scenes, raymarcher, initial_scene, video)
 
 	const elem_reflections = document.querySelector('#menu-reflections')
 	reflection_chooser(elem_reflections, raymarcher)

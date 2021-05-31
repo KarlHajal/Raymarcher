@@ -1,12 +1,13 @@
 
 import {createREGL} from "../lib/regljs_2.1.0/regl.module.js"
 import {setMatrixArrayType} from "../lib/gl-matrix_3.3.0/esm/common.js"
-import {DOM_loaded_promise, register_button_with_hotkey} from "./icg_web.js"
+import {DOM_loaded_promise, register_button_with_hotkey, register_keyboard_action} from "./icg_web.js"
 
 import {Raymarcher} from "./raymarcher_pipeline.js"
 import {SCENES} from "./scenes.js"
 
 import {init_menu} from "./menu.js"
+import {CanvasVideoRecording} from "./icg_screenshot.js"
 
 setMatrixArrayType(Array);
 
@@ -35,7 +36,11 @@ function init_dom_elems(elem_canvas, on_resize_func) {
 }
 
 async function main() {
-	const elem_canvas = document.getElementById('viewport')
+	const elem_canvas = document.getElementById('viewport');
+	
+	elem_canvas.width = 1920;
+	elem_canvas.height = 1080;
+
 	const debug_text = document.getElementById('debug-text')
 
 	const regl = createREGL({
@@ -44,6 +49,7 @@ async function main() {
 		extensions: [
 		], 
 	})
+
 	console.log('MAX_VERTEX_UNIFORM_VECTORS', regl._gl.MAX_VERTEX_UNIFORM_VECTORS)
 
 	// Init ray-marching
@@ -60,7 +66,27 @@ async function main() {
 		raymarcher.save_image()
 	})
 
-	init_menu(raymarcher, 'Box')
+	const video = new CanvasVideoRecording({
+		canvas: elem_canvas,
+		
+		// tweak that if the quality is bad https://developer.mozilla.org/en-US/docs/Web/API/MediaRecorder/MediaRecorder
+		videoBitsPerSecond: 15*1024*1024,
+	});
+
+	function video_start_stop() {
+		if(video.is_recording()) {
+			video.stop();
+			console.log("Stopped recording");
+		} else {
+			video.start();
+			console.log("Started recording");
+		}
+	};
+
+	register_keyboard_action('r', video_start_stop);
+
+
+	init_menu(raymarcher, 'Box', video);
 }
 
 async function entrypoint() {

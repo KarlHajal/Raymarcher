@@ -646,7 +646,7 @@ export class Raymarcher {
 		return scene_name === "Waves" || scene_name === "Clouds" || scene_name === "3D-Perlin-Noise" || scene_name === "3D-Perlin-Noise+FBM";
 	}
 
-	async draw_scene({scene_name, num_reflections}) {
+	async draw_scene({scene_name, num_reflections}, video) {
 
 		const scene_def = this.scenes_by_name[scene_name];
 
@@ -671,6 +671,9 @@ export class Raymarcher {
 			this.noise_interval = setInterval(() => {
 				this.execute_pipeline(this.ray_marcher_pipeline_for_noise(scene_def))
 				this.noise_iteration += 1;
+				if(video.is_recording()){
+					video.push_frame();
+				}
 			}, 1000/30);
 		}		
 		else if(scene_name !== this.scene_name || num_reflections !== this.num_reflections) {
@@ -684,10 +687,10 @@ export class Raymarcher {
 			const camera = scene_def.camera;
 			this.noise_interval = setInterval(() => {
 				if(camera.up[1] === 1){
-					vec3.rotateY(camera.position, camera.position, camera.target, toRadian(2));
+					vec3.rotateY(camera.position, camera.position, camera.target, toRadian(1));
 				}
 				else{
-					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(2));
+					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(1));
 				}
 				this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
 			}, 1000/30);
