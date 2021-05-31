@@ -217,7 +217,7 @@ SCENES.push({
 SCENES.push({
 	name: 'Box',
 	camera: {
-		position: [-1, 3, 10], target: [-1, 0, 3], up: [0, 1, 0], fov: 65,
+		position: [-1, 3, 10], target: [0, 0, -3], up: [0, 1, 0], fov: 65,
 	},
 	materials: [
 		{name: 'floor', color: [1., 1., 1.], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.5},
