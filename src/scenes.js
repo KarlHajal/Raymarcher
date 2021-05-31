@@ -386,6 +386,15 @@ SCENES.push({
 });
 
 SCENES.push({
+	name: '3D-Perlin-Noise+FBM',
+	is_noise: 1,
+	fbm: 1,
+	camera: {
+		position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+	},
+});
+
+SCENES.push({
 	name: 'Waves',
 	is_noise: 1,
 	camera: {

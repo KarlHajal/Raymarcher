@@ -459,7 +459,6 @@ export class Raymarcher {
 			'NUM_REFLECTIONS': this.num_reflections,
 		}
 
-
 		const material_id_by_name = {}
 
 		const materials = scene.materials ? scene.materials : [];
@@ -543,6 +542,7 @@ export class Raymarcher {
 		}
 		else {
 			frag = this.resources_ready.raymarcher_3d_perlin_noise_frag;
+			code_injections['FBM'] = scene.fbm ? "1" : "0";
 		}
 		const shader_frag = this.shader_inject_defines(frag, code_injections)
 
@@ -642,6 +642,10 @@ export class Raymarcher {
 		this.regenerate_view();
 	}
 
+	scene_is_noise(scene_name){
+		return scene_name === "Waves" || scene_name === "Clouds" || scene_name === "3D-Perlin-Noise" || scene_name === "3D-Perlin-Noise+FBM";
+	}
+
 	async draw_scene({scene_name, num_reflections}) {
 
 		const scene_def = this.scenes_by_name[scene_name];
@@ -655,7 +659,7 @@ export class Raymarcher {
 			num_reflections = this.num_reflections
 		}
 
-		if(scene_name !== this.scene_name && (scene_name === "Waves" || scene_name === "Clouds" || scene_name === "3D-Perlin-Noise")){
+		if(scene_name !== this.scene_name && (this.scene_is_noise(scene_name))){
 			if(this.noise_interval !== null){
 				clearInterval(this.noise_interval);
 				this.noise_interval = null;

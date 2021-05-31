@@ -7,6 +7,8 @@ varying vec3 v2f_ray_direction;
 #define MAX_ITERATIONS 256.0
 #define FAR_PLANE 100.0
 
+//#define FBM
+
 uniform float current_time;
 
 float time = current_time/20.;
@@ -60,15 +62,26 @@ vec3 compute_pixel_color(vec3 origin, vec3 ray, vec2 uv)
     float depth = 0.1;
     for (int i = 0; i < int(MAX_ITERATIONS); i++)
     {
-        float d = noise_sdf(ray * depth + origin) + clamp(1.0 - depth / 6.0, 0.0, 1.0);
-        if (d < EPSILON)
-        {
+        float d;
+        
+        #if FBM
+        d = fbm_sdf(ray * depth + origin);
+        #else
+        d = noise_sdf(ray * depth + origin);
+        #endif
+        
+        d += clamp(1.0 - depth / 6.0, 0.0, 1.0);
+
+        if (d < EPSILON){
             float t = time;
+            
             color.r = 0.;
             color.g = 0.7;
             color.b = 0.7*sin(uv.y - t + cos(uv.x));
             color = color * 0.5 + 0.5;
+            
             float a = float(i) / MAX_ITERATIONS;
+
             return color * (1.0 - 0.5*a) + a * 0.2 * background_color;
         }
         depth += d;
