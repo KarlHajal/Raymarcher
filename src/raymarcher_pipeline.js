@@ -693,6 +693,9 @@ export class Raymarcher {
 					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(1));
 				}
 				this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
+				if(video.is_recording()){
+					video.push_frame();
+				}
 			}, 1000/30);
 		}
 	}
