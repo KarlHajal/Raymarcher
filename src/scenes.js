@@ -378,7 +378,16 @@ SCENES.push({
 });
 
 SCENES.push({
+	name: '3D-Perlin-Noise',
+	is_noise: 1,
+	camera: {
+		position: [0, 0, 0], target: [0, 0, 1], up: [0, 1, 0], fov: 75,
+	},
+});
+
+SCENES.push({
 	name: 'Waves',
+	is_noise: 1,
 	camera: {
 		position: [0, 1, 0], target: [0, 0.3, 1], up: [0, 1, 0], fov: 75,
 	},
@@ -386,6 +395,7 @@ SCENES.push({
 
 SCENES.push({
 	name: 'Clouds',
+	is_noise: 1,
 	camera: {
 		position: [0, 5, 0], target: [5, 0, 5], up: [0, 1, 0], fov: 75,
 	},
