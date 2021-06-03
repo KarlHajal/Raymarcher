@@ -14,7 +14,7 @@ varying vec3 v2f_ray_direction;
 
 uniform float current_time;
 
-float time = current_time/20.;
+float time = current_time/100.;
 
 const vec3 sun_direction = vec3(-1, .2, -1);
 

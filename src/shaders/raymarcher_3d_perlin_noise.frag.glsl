@@ -11,7 +11,7 @@ varying vec3 v2f_ray_direction;
 
 uniform float current_time;
 
-float time = current_time/20.;
+float time = current_time/40.;
 
 vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
 
