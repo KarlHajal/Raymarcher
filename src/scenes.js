@@ -114,6 +114,7 @@ SCENES.push({
 	camera: {
 		position: [1, 3, 10], target: [1, 0, 3], up: [0, 1, 0], fov: 65,
 	},
+	soft_shadows_factor: 20.0,
 	materials: [
 		{name: 'floor', color: [1., 1., 1.], ambient: 0.1, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.8},
 		{name: 'white', color: [0.9, 0.9, 0.9], ambient: 0.3, diffuse: 0.9, specular: 0.1, shininess: 4., mirror: 0.1},
