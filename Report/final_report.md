@@ -210,10 +210,27 @@ Next, we explored producing waves by raymarching 3D noise, inspired by following
 Finally, we attempted to produce clouds, inspired by the waves shader and a multitude of shaders which achieved all kinds of effects with the same principles, including this clouds shaders: [Clouds](https://www.shadertoy.com/view/lssGRX). We also modified it to use noise functions rather than textures, significantly simplified the code and tweaked the aesthetics and colors to our liking.
 
 
+## Results
+
+All the scenes and features mentioned above can be tested and rendered by running the WebGL source code which we have included with our deliverables and which has all the scenes pre-defined.
+
+Further, the video below summarizes and shows off all the features described in this report, the results of which have mostly been shown in figures above.
+
+<iframe width="420" height="315"
+src="https://www.youtube.com/embed/dxjDXLZMDC8">
+</iframe>
+
 ## Contributions from each team member
-* Karl: Project setup and basic distance functions.
-* Bogdan: Implementation of most distance functions and rendering of varied shapes.
-* Omer: Lighting and shading.
+* Karl: Project setup and first distance function, Combinations of Primitives, Ambient Occlusion, Noise.
+* Bogdan: Lighting, Shading, Reflections, Soft Shadows, Environment Mapping, Noise.
+* Omer: Implementation of most distance functions, Combinations of Primitives, Camera Movement, Noise.
 
 
 ## References
+* [Inigo Quilez - SDFs](https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm)
+* [Inigo Quilez - Soft Shadows](https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm)
+* [Ambient Occlusion](https://vr.arvilab.com/blog/ambient-occlusion)
+* [Exploring 3D Perlin Noise](https://www.youtube.com/watch?v=vPy7WOHs2qs)
+* [Buoy](https://www.shadertoy.com/view/XdsGDB)
+* [Clouds](https://www.shadertoy.com/view/lssGRX)
+* Code Libraries Used: regljs and gl-matrix

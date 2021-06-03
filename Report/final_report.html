@@ -182,12 +182,28 @@ vec4 get_sphere(<span class="dt">int</span> sphere_index){
 </p>
 
 <p>Finally, we attempted to produce clouds, inspired by the waves shader and a multitude of shaders which achieved all kinds of effects with the same principles, including this clouds shaders: <a href="https://www.shadertoy.com/view/lssGRX">Clouds</a>. We also modified it to use noise functions rather than textures, significantly simplified the code and tweaked the aesthetics and colors to our liking.</p>
+<h2 id="results">Results</h2>
+<p>All the scenes and features mentioned above can be tested and rendered by running the WebGL source code which we have included with our deliverables and which has all the scenes pre-defined.</p>
+<p>Further, the video below summarizes and shows off all the features described in this report, the results of which have mostly been shown in figures above.</p>
+<iframe width="420" height="315"
+src="https://www.youtube.com/embed/dxjDXLZMDC8">
+</iframe>
+
 <h2 id="contributions-from-each-team-member">Contributions from each team member</h2>
 <ul>
-<li>Karl: Project setup and basic distance functions.</li>
-<li>Bogdan: Implementation of most distance functions and rendering of varied shapes.</li>
-<li>Omer: Lighting and shading.</li>
+<li>Karl: Project setup and first distance function, Combinations of Primitives, Ambient Occlusion, Noise.</li>
+<li>Bogdan: Lighting, Shading, Reflections, Soft Shadows, Environment Mapping, Noise.</li>
+<li>Omer: Implementation of most distance functions, Combinations of Primitives, Camera Movement, Noise.</li>
 </ul>
 <h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm">Inigo Quilez - SDFs</a></li>
+<li><a href="https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm">Inigo Quilez - Soft Shadows</a></li>
+<li><a href="https://vr.arvilab.com/blog/ambient-occlusion">Ambient Occlusion</a></li>
+<li><a href="https://www.youtube.com/watch?v=vPy7WOHs2qs">Exploring 3D Perlin Noise</a></li>
+<li><a href="https://www.shadertoy.com/view/XdsGDB">Buoy</a></li>
+<li><a href="https://www.shadertoy.com/view/lssGRX">Clouds</a></li>
+<li>Code Libraries Used: regljs and gl-matrix</li>
+</ul>
 </body>
 </html>
