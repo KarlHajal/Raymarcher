@@ -148,22 +148,72 @@ It is a very straightforward implementation which we can benefit from since we'r
 
 
 ### Ambient Occlusion
-<video controls width="250"> <source src="images/ao_60fps.webm" type="video/webm"></video>
+<p align="center">
+    <video controls width="500"> <source src="images/ao_60fps.webm" type="video/webm"></video>
+</p>
 
-We implemented Ambient Occlusion by casting from each surface point 32 rays in random directions along a hemisphere whose direction was based on the normal at that point on the surface. The number of rays who intersect with other surfaces are counted, and the ambient occlusion function returns the percentage of rays that have intersected. The higher that number, the darker the spot is.
+We implemented Ambient Occlusion by casting from each surface point 32 rays in random directions along a hemisphere whose direction was based on the surface normal. The number of rays who intersect with surfaces are counted, and the ambient occlusion function returns the percentage of rays that have intersected. The higher that number is, the darker the spot is.
 
 ![Ambient Occlusion Diagram](images/ambient_occlusion_diagram.jpg)
 
 The above video gives an example of a scene rendered with the Ambient contribution only for lighting, which showcases the effects of Ambient Occlusion.
 
-### Noise
+We further experimented with a "fake" Ambient Occlusion implementation which is more efficient and basically consists of casting 8 rays in fixed and predefined directions and returning a smoother result. This implementation yields similarly satisfactory results when rendering scenes with several types of lighting, essentially achieving the darkening of spots that are surrounded by several surfaces and improving the quality of the lighting in a scene. However, when the scene is rendered with the ambient contribution only, we can see that it yields wildly different results to the first implementation. While the original implementation yields a very nice and playdough-ish style, this one is only focused on heavily darkening surfaces such as edges and not affecting the rest. Both can have their uses when trying to achieve novel non-photorealistic rendering effects. A comparison is shown below with the "fake" implementation on the left, and the more involved one on the right:
+
+<img align="left" width="475" height="475" src="images/fake_AO.png">
+
+<img align="right" width="475" height="475" src="images/AO.png">
+
+<br/><br/>
+
+\_
+
+### Environment Mapping
+
+<video align="left" controls width="475"> <source src="images/env_map_1_60fps.webm" type="video/webm"></video>
+<video align="right" controls width="475"> <source src="images/env_map_2_60fps.webm" type="video/webm"></video>
+
+<br/><br/>
+
+Environment Mapping was implemented using cubemaps which were passed to the shader as a uniform samplerCube, and consequently, whenever a ray doesn't intersect with any surface, we set the color of the pixel depending on the texture's color at the corresponding position. 
+
+Environment Mapping can be enabled from in the JSON, and any cubemap can be specified. 3 examples are provided with the source code.
 
 
 ### Camera Movement
 
+We worked on moving the camera in real-time to look around the scene, but we struggled to render the scenes at a high enough framrate to make it smooth to use. Therefore, to produce some nice visuals for the video, we finally only added a simple rotation to the camera such that it orbits around the target and recorded the frames at a very slow framerate using the provided technique to record WebGL, and consequently fixed the framerate to 60 fps to get smooth videos to show.
 
-## Task distribution
-#### Ray Marching
+### Noise
+
+<video align="left" controls width="475"> <source src="images/3d_perlin_noise_60fps.webm" type="video/webm"></video>
+<video align="right" controls width="475"> <source src="images/fbm_noise_60fps.webm" type="video/webm"></video>
+
+<br/><br/>
+
+Finally, with the help of some examples, we explored ray marching 3D noise functions and how they are used to achieve good looking visuals of all kind. 
+
+We started by raymarching 3D Perlin noise with and without FBM to achieve very soothing effects to look at. The results are shown above, whereas we are essentially sampling the noise and playing around with the colors, varying them with position, depth and time. We were inspired by the following reference: [Exploring 3D Perlin Noise](https://www.youtube.com/watch?v=vPy7WOHs2qs)
+
+
+<p align="center">
+    <video controls width="500"> <source src="images/waves_60fps.webm" type="video/webm"></video>
+</p>
+
+
+Next, we explored producing waves by raymarching 3D noise, inspired by following: [Buoy](https://www.shadertoy.com/view/XdsGDB). We essentially significantly refactored and simplified the code and made it fit our implementation. We also used noise functions instead of sampling noise textures, and modified the results to our liking. The results are shown above.
+
+<p align="center">
+    <video controls width="500"> <source src="images/clouds_60fps.webm" type="video/webm"></video>
+</p>
+
+Finally, we attempted to produce clouds, inspired by the waves shader and a multitude of shaders which achieved all kinds of effects with the same principles, including this clouds shaders: [Clouds](https://www.shadertoy.com/view/lssGRX). We also modified it to use noise functions rather than textures, significantly simplified the code and tweaked the aesthetics and colors to our liking.
+
+
+## Contributions from each team member
 * Karl: Project setup and basic distance functions.
 * Bogdan: Implementation of most distance functions and rendering of varied shapes.
 * Omer: Lighting and shading.
+
+
+## References

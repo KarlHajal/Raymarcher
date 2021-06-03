@@ -127,23 +127,67 @@ vec4 get_sphere(<span class="dt">int</span> sphere_index){
 <p>The implementation was done with the help of the following reference: <a href="https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm">Inigo Quilez - Soft Shadows</a>.</p>
 <p>It is a very straightforward implementation which we can benefit from since we're doing ray marching. Essentially, when computing sharp shadows, we check if the ray from a surface to the light source intersects with an object, and if it does then there's a shadow. For soft shadows, we use the fact that we are calculating distances to check how far the ray is from the object in case there's no intersection. Consequently, when the distance is very small, we want to put the point on the surface under penumbra, i.e. the smaller the distance from the surface, the darker the point should be. So with this slight modification to the code that allows us to modify the darkness of each point in this soft manner and to control it by a variable factor, we can very easily achieve nice effects such as the one seen in the image above.</p>
 <h3 id="ambient-occlusion">Ambient Occlusion</h3>
-<video controls width="250"> 
+<p align="center">
+    <video controls width="500"> 
 <source src="images/ao_60fps.webm" type="video/webm">
 </video>
+</p>
 
-<p>We implemented Ambient Occlusion by casting from each surface point 32 rays in random directions along a hemisphere whose direction was based on the normal at that point on the surface. The number of rays who intersect with other surfaces are counted, and the ambient occlusion function returns the percentage of rays that have intersected. The higher that number, the darker the spot is.</p>
+<p>We implemented Ambient Occlusion by casting from each surface point 32 rays in random directions along a hemisphere whose direction was based on the surface normal. The number of rays who intersect with surfaces are counted, and the ambient occlusion function returns the percentage of rays that have intersected. The higher that number is, the darker the spot is.</p>
 <div class="figure">
 <img src="images/ambient_occlusion_diagram.jpg" alt="Ambient Occlusion Diagram" /><p class="caption">Ambient Occlusion Diagram</p>
 </div>
 <p>The above video gives an example of a scene rendered with the Ambient contribution only for lighting, which showcases the effects of Ambient Occlusion.</p>
-<h3 id="noise">Noise</h3>
+<p>We further experimented with a &quot;fake&quot; Ambient Occlusion implementation which is more efficient and basically consists of casting 8 rays in fixed and predefined directions and returning a smoother result. This implementation yields similarly satisfactory results when rendering scenes with several types of lighting, essentially achieving the darkening of spots that are surrounded by several surfaces and improving the quality of the lighting in a scene. However, when the scene is rendered with the ambient contribution only, we can see that it yields wildly different results to the first implementation. While the original implementation yields a very nice and playdough-ish style, this one is only focused on heavily darkening surfaces such as edges and not affecting the rest. Both can have their uses when trying to achieve novel non-photorealistic rendering effects. A comparison is shown below with the &quot;fake&quot; implementation on the left, and the more involved one on the right:</p>
+<p><img align="left" width="475" height="475" src="images/fake_AO.png"></p>
+<p><img align="right" width="475" height="475" src="images/AO.png"></p>
+<p><br/><br/></p>
+<p>_</p>
+<h3 id="environment-mapping">Environment Mapping</h3>
+<video align="left" controls width="475"> 
+<source src="images/env_map_1_60fps.webm" type="video/webm">
+</video>
+<video align="right" controls width="475"> 
+<source src="images/env_map_2_60fps.webm" type="video/webm">
+</video>
+
+<p><br/><br/></p>
+<p>Environment Mapping was implemented using cubemaps which were passed to the shader as a uniform samplerCube, and consequently, whenever a ray doesn't intersect with any surface, we set the color of the pixel depending on the texture's color at the corresponding position.</p>
+<p>Environment Mapping can be enabled from in the JSON, and any cubemap can be specified. 3 examples are provided with the source code.</p>
 <h3 id="camera-movement">Camera Movement</h3>
-<h2 id="task-distribution">Task distribution</h2>
-<h4 id="ray-marching">Ray Marching</h4>
+<p>We worked on moving the camera in real-time to look around the scene, but we struggled to render the scenes at a high enough framrate to make it smooth to use. Therefore, to produce some nice visuals for the video, we finally only added a simple rotation to the camera such that it orbits around the target and recorded the frames at a very slow framerate using the provided technique to record WebGL, and consequently fixed the framerate to 60 fps to get smooth videos to show.</p>
+<h3 id="noise">Noise</h3>
+<video align="left" controls width="475"> 
+<source src="images/3d_perlin_noise_60fps.webm" type="video/webm">
+</video>
+<video align="right" controls width="475"> 
+<source src="images/fbm_noise_60fps.webm" type="video/webm">
+</video>
+
+<p><br/><br/></p>
+<p>Finally, with the help of some examples, we explored ray marching 3D noise functions and how they are used to achieve good looking visuals of all kind.</p>
+<p>We started by raymarching 3D Perlin noise with and without FBM to achieve very soothing effects to look at. The results are shown above, whereas we are essentially sampling the noise and playing around with the colors, varying them with position, depth and time. We were inspired by the following reference: <a href="https://www.youtube.com/watch?v=vPy7WOHs2qs">Exploring 3D Perlin Noise</a></p>
+<p align="center">
+    <video controls width="500"> 
+<source src="images/waves_60fps.webm" type="video/webm">
+</video>
+</p>
+
+
+<p>Next, we explored producing waves by raymarching 3D noise, inspired by following: <a href="https://www.shadertoy.com/view/XdsGDB">Buoy</a>. We essentially significantly refactored and simplified the code and made it fit our implementation. We also used noise functions instead of sampling noise textures, and modified the results to our liking. The results are shown above.</p>
+<p align="center">
+    <video controls width="500"> 
+<source src="images/clouds_60fps.webm" type="video/webm">
+</video>
+</p>
+
+<p>Finally, we attempted to produce clouds, inspired by the waves shader and a multitude of shaders which achieved all kinds of effects with the same principles, including this clouds shaders: <a href="https://www.shadertoy.com/view/lssGRX">Clouds</a>. We also modified it to use noise functions rather than textures, significantly simplified the code and tweaked the aesthetics and colors to our liking.</p>
+<h2 id="contributions-from-each-team-member">Contributions from each team member</h2>
 <ul>
 <li>Karl: Project setup and basic distance functions.</li>
 <li>Bogdan: Implementation of most distance functions and rendering of varied shapes.</li>
 <li>Omer: Lighting and shading.</li>
 </ul>
+<h2 id="references">References</h2>
 </body>
 </html>
