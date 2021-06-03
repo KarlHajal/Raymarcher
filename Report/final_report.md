@@ -63,6 +63,8 @@ We handled communicating the shapes from Javascript to GLSL very similarly to th
 
 However, the aforementioned SDFs assume that the primitives are centered at the origin. Therefore, before using each one, we have to transform the position of the point from which we're checking the distance to each primitive so that it would be at the same position relative to the corresponding shape if the latter was centered at the origin.
 
+One problem that we should mention and which we only noticed towards the end is that, for some reason, the scenes are not rendered correctly on Ubuntu machines. As we were all developing on Windows, we only noticed that too late and had no time to figure out the issue, which might possibly be due to differences in graphics drivers which lead to some detail in the implementation being incompatible with Linux systems.
+
 
 ### Combinations
 
