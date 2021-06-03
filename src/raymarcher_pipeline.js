@@ -682,17 +682,18 @@ export class Raymarcher {
 
 			this.scene_name = scene_name
 			this.num_reflections = num_reflections
-			const camera = scene_def.camera;
-			this.noise_interval = setInterval(() => {
+			//const camera = scene_def.camera;
+			//vec3.rotateY(camera.position, camera.position, camera.target, toRadian(180));
+			/*this.noise_interval = setInterval(() => {
 				if(camera.up[1] === 1){
 					vec3.rotateY(camera.position, camera.position, camera.target, toRadian(1));
 				}
 				else{
 					vec3.rotateZ(camera.position, camera.position, camera.target, toRadian(1));
-				}
+				}*/
 				this.execute_pipeline(this.ray_marcher_pipeline_for_scene(scene_def));
-				video.push_frame();
-			}, 1000/30);
+				//video.push_frame();
+			//}, 1000/10);
 		}
 	}
 

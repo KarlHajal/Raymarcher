@@ -1,7 +1,7 @@
 
 function scene_chooser(elem, raymarcher, initial_scene, video) {
 
-	const videoz = video;
+	const video_rec = video;
 	const buttons = {}
 
 	function update() {
@@ -15,7 +15,7 @@ function scene_chooser(elem, raymarcher, initial_scene, video) {
 
 	function set_scene(sc_name) {
 		if(sc_name != raymarcher.scene_name) {
-			raymarcher.draw_scene({scene_name: sc_name}, videoz)
+			raymarcher.draw_scene({scene_name: sc_name}, video_rec)
 			update()
 		}
 	}
@@ -50,7 +50,7 @@ function scene_chooser(elem, raymarcher, initial_scene, video) {
 
 function reflection_chooser(elem, raymarcher, video) {
 
-	const videoz = video;
+	const video_rec = video;
 	const buttons = []
 
 	function update() {
@@ -65,7 +65,7 @@ function reflection_chooser(elem, raymarcher, video) {
 			raymarcher.draw_scene({
 				scene_name: raymarcher.scene_name,
 				num_reflections: num_reflections,
-			}, videoz)
+			}, video_rec)
 			update()
 		}
 	}
