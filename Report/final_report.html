@@ -1,0 +1,149 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Ray Marching and Ambient Occlusion Rendering</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+  <link rel="stylesheet" href="icg_report.css" type="text/css" />
+</head>
+<body>
+<div id="header">
+<h1 class="title">Ray Marching and Ambient Occlusion Rendering</h1>
+</div>
+<h4 id="group-22-omer-farük-akgül-bogdan-stéphane-boucher-karl-el-hajal">Group 22: Omer Farük Akgül, Bogdan Stéphane Boucher, Karl El Hajal</h4>
+<h2 id="abstract">Abstract</h2>
+<p>We developed a ray marching engine in WebGL that allows users to specify scenes to be rendered in JSON format. Its architecture is based on the raytracing framework used in the course exercises, and it implements the following features:</p>
+<ul>
+<li>Adaptive ray-marching algorithm (sphere-tracing)</li>
+<li>Handles 16 different primitives with full control over their position and rotation.</li>
+<li>Support for combinations of shapes (intersection, union, subtraction). Any two primitives can be specified in the JSON file to be combined.</li>
+<li>Phong lighting and reflections.</li>
+<li>Soft shadows can be enabled, and the factor can be specified.</li>
+<li>Ambient Occlusion</li>
+<li>Environment Mapping can be enabled and any desired cubemap specified with 3 examples provided.</li>
+<li>We further added 4 scenes where noise is raymarched to achieve aesthetic results: 3D Perlin Noise, 3D Perlin Noise + FBM, Waves, and Clouds.</li>
+</ul>
+<h2 id="technical-approach">Technical Approach</h2>
+<h3 id="raymarching">Raymarching</h3>
+<p>To achieve adaptive ray-marching, we implemented the basic sphere tracing algorithm whereas at every iteration, we call the function that calculates the shortest distance to a surface in the scene and, if that distance is not small enough, the point along the ray is advanced by that distance so as not to penetrate any surface in the scene.</p>
+<div class="figure">
+<img src="images/ray_marching_sphere.png" alt="Sphere Tracing" /><p class="caption">Sphere Tracing</p>
+</div>
+<p>This is implemented as follows:</p>
+<pre class="sourceCode c"><code class="sourceCode c"><span class="dt">float</span> raymarch(vec3 ray_origin, vec3 marching_direction, out <span class="dt">int</span> material_id) {
+    <span class="dt">float</span> depth = MIN_DISTANCE;
+    <span class="kw">for</span> (<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; MAX_MARCHING_STEPS; i++) {
+        <span class="dt">float</span> dist = scene_sdf(ray_origin + depth * marching_direction, material_id);
+        
+        <span class="kw">if</span> (dist &lt; EPSILON) {
+            <span class="kw">return</span> depth;
+        }
+        
+        depth += dist;
+        
+        <span class="kw">if</span> (depth &gt; MAX_DISTANCE) {
+            <span class="kw">return</span> MAX_DISTANCE;
+        }
+    }
+    <span class="kw">return</span> MAX_DISTANCE;
+}</code></pre>
+<h3 id="basic-primitives">Basic Primitives</h3>
+<p><img align="left" width="475" height="475" src="images/spheres_cylinders.png"></p>
+<p><img align="right" width="475" height="475" src="images/primitives.png"></p>
+<p><br/><br/></p>
+<p>We added to ability to specify in the JSON file 16 different primitives which are the following: Plane, Sphere, Box (+ rounded edges), Box Frame, Cylinder, Capsule, Torus, Triangle, Triangular, Link, Cone, Pyramid, Hexagonal, Ellipsoid, Octahedron.</p>
+<p>We handled communicating the shapes from Javascript to GLSL very similarly to the exercises for performance reasons (as will be elaborated upon in the next section), and the Signed Distance Function (SDF) for each primitive was implemented with the help of the following resource: <a href="https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm">Inigo Quilez - SDFs</a>.</p>
+<p>However, the aforementioned SDFs assume that the primitives are centered at the origin. Therefore, before using each one, we have to transform the position of the point from which we're checking the distance to each primitive so that it would be at the same position relative to the corresponding shape if the latter was centered at the origin.</p>
+<h3 id="combinations">Combinations</h3>
+<p><img align="left" width="475" height="475" src="images/Unions.png"></p>
+<p><img align="right" width="475" height="475" src="images/Subtractions.png"></p>
+<p><br/><br/></p>
+<p><img width="475" height="475" src="images/Intersections.png"></p>
+<p><br/><br/></p>
+<p>We added the ability of adding smooth intersections, unions, or subtractions of any two primitives in JSON format directly as shown in the following example:</p>
+<pre class="sourceCode json"><code class="sourceCode json"><span class="er">unions:</span> [
+    {   
+        <span class="er">material</span>: <span class="er">&#39;white&#39;</span>,
+        <span class="er">smooth_factor</span>: <span class="fl">0.7</span>,
+        <span class="er">shapes</span>: [
+            {<span class="er">type</span>: <span class="er">&#39;box&#39;</span>, <span class="er">center</span>: [<span class="dv">-1</span>, <span class="dv">2</span>, <span class="fl">0.1</span>], <span class="er">length</span>: <span class="fl">2.5</span>, <span class="er">width</span>: <span class="fl">2.5</span>, <span class="er">height</span>: <span class="fl">0.7</span>, <span class="er">rotation_x</span>: <span class="dv">0</span>, <span class="er">rotation_y</span>: <span class="dv">0</span>, <span class="er">rotation_z</span>: <span class="dv">0</span>, <span class="er">rounded_edges_radius</span>: <span class="fl">0.1</span>, <span class="er">is_frame</span>: <span class="dv">0</span>},
+            {<span class="er">type</span>: <span class="er">&#39;sphere&#39;</span>, <span class="er">center</span>: [<span class="dv">-1</span>, <span class="dv">2</span>, <span class="fl">0.5</span>], <span class="er">radius</span>: <span class="fl">0.8</span>}
+        ]
+    },
+]</code></pre>
+<p>This was very challenging since it meant that the way we were going through the primitives in the exercise session wouldn't do the trick since we cannot iterate through the shapes one primitive at a time and in any order. Our new solution involved creating a ShapesCombination struct in the shader which has information that allows us to locate each one of the two shapes:</p>
+<pre class="sourceCode c"><code class="sourceCode c"><span class="kw">struct</span> ShapesCombination {
+    <span class="dt">int</span> shape1_id;
+    <span class="dt">int</span> shape1_index;
+    <span class="dt">int</span> shape2_id;
+    <span class="dt">int</span> shape2_index;
+    <span class="dt">int</span> material_id;
+    <span class="dt">float</span> smooth_factor;
+};</code></pre>
+<p>Where the shape id tells us what type of primitive the shape belongs to (e.g. shape1_id == 1 means that it's a sphere), and the shape index tells us at what index of the array of that primitive this particular shape is contained. And to be able to access each shape using the index, we had to add for each primitive a get function such as the one shown below:</p>
+<pre class="sourceCode c"><code class="sourceCode c"><span class="ot">#if COMBINATION_NUM_SPHERES != 0</span>
+vec4 get_sphere(<span class="dt">int</span> sphere_index){
+    <span class="kw">for</span>(<span class="dt">int</span> i = <span class="dv">0</span>; i &lt; COMBINATION_NUM_SPHERES; ++i){
+        <span class="kw">if</span>(i == sphere_index){
+            <span class="kw">return</span> combination_spheres_center_radius[i];
+        }
+    }
+    <span class="kw">return</span> combination_spheres_center_radius[<span class="dv">0</span>];
+}
+<span class="ot">#endif</span></code></pre>
+<p>While this implementation is nice in the sense that it works and allows us to set directly in the JSON format any two primitives to be combined, it has a major drawback, which is that rendering combinations is extremely slow. This is most probably due to the heavy cost of branching. This was disappointing since this implementation alone can handle both basic primitives and combinations and yields very clean code. But due to its slowness, we opted to keep the original implementation for the primitves, and add this one to be used for combinations only since it's the only way to achieve what we wanted.</p>
+<p>In conclusion, this implementation allowed us to specify combinations dynamically in the JSON, but had the drawback that we had to add a lot of code on top of what we had, making it quite hefty, and is very slow.</p>
+<h3 id="lighting">Lighting</h3>
+<div class="figure">
+<img src="images/Shading.png" alt="Shading scene from the exercise sessions rendered in our engine" /><p class="caption">Shading scene from the exercise sessions rendered in our engine</p>
+</div>
+<p>We implemented basic phong lighting and reflections in the same way we did in the ray tracing exercises, so we will only elaborate on the following sections which describe novel aspects in lighting and shading.</p>
+<h3 id="soft-shadows">Soft Shadows</h3>
+<p><img align="left" width="475" height="475" src="images/box_no_soft_shadow.png"></p>
+<p><img align="right" width="475" height="475" src="images/box_soft_shadow_20.png"></p>
+<p><br/><br/></p>
+<p>Soft shadows with penumbra were implemented to add better looking and more realistic shadows. They can be enabled from the JSON by adding the option, and the soft shadows factor can be specified.</p>
+<p>The implementation was done with the help of the following reference: <a href="https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm">Inigo Quilez - Soft Shadows</a>.</p>
+<p>It is a very straightforward implementation which we can benefit from since we're doing ray marching. Essentially, when computing sharp shadows, we check if the ray from a surface to the light source intersects with an object, and if it does then there's a shadow. For soft shadows, we use the fact that we are calculating distances to check how far the ray is from the object in case there's no intersection. Consequently, when the distance is very small, we want to put the point on the surface under penumbra, i.e. the smaller the distance from the surface, the darker the point should be. So with this slight modification to the code that allows us to modify the darkness of each point in this soft manner and to control it by a variable factor, we can very easily achieve nice effects such as the one seen in the image above.</p>
+<h3 id="ambient-occlusion">Ambient Occlusion</h3>
+<video controls width="250"> 
+<source src="images/ao_60fps.webm" type="video/webm">
+</video>
+
+<p>We implemented Ambient Occlusion by casting from each surface point 32 rays in random directions along a hemisphere whose direction was based on the normal at that point on the surface. The number of rays who intersect with other surfaces are counted, and the ambient occlusion function returns the percentage of rays that have intersected. The higher that number, the darker the spot is.</p>
+<div class="figure">
+<img src="images/ambient_occlusion_diagram.jpg" alt="Ambient Occlusion Diagram" /><p class="caption">Ambient Occlusion Diagram</p>
+</div>
+<p>The above video gives an example of a scene rendered with the Ambient contribution only for lighting, which showcases the effects of Ambient Occlusion.</p>
+<h3 id="noise">Noise</h3>
+<h3 id="camera-movement">Camera Movement</h3>
+<h2 id="task-distribution">Task distribution</h2>
+<h4 id="ray-marching">Ray Marching</h4>
+<ul>
+<li>Karl: Project setup and basic distance functions.</li>
+<li>Bogdan: Implementation of most distance functions and rendering of varied shapes.</li>
+<li>Omer: Lighting and shading.</li>
+</ul>
+</body>
+</html>
