@@ -1102,8 +1102,7 @@ vec3 compute_pixel_color(vec3 ray_origin, vec3 ray_direction){
 
 	for(int i_reflection = 0; i_reflection < NUM_REFLECTIONS+1; i_reflection++) {
 		int material_id;
-
-		float start = MIN_DISTANCE;
+		
 		float end = MAX_DISTANCE;
 		float dist = raymarch(ray_origin, ray_direction, material_id);
 
