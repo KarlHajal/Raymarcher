@@ -55,11 +55,11 @@ float raymarch(vec3 ray_origin, vec3 marching_direction, out int material_id) {
 
 We added to ability to specify in the JSON file 16 different primitives which are the following: Plane, Sphere, Box (+ rounded edges), Box Frame, Cylinder, Capsule, Torus, Triangle, Triangular, Link, Cone, Pyramid, Hexagonal, Ellipsoid, Octahedron.
 
-We handled communicating the shapes from Javascript to GLSL very similarly to the exercises for performance reasons (as will be elaborated upon in the next section), and the Signed Distance Function (SDF) for each primitive was implemented with the help of the following resource: [Inigo Quilez - SDFs](https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm).
+The Signed Distance Function (SDF) for each primitive was implemented with the help of the following resource: [Inigo Quilez - SDFs](https://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm).
 
 However, the aforementioned SDFs assume that the primitives are centered at the origin. Therefore, before using each one, we have to transform the position of the point from which we're checking the distance to each primitive so that it would be at the same position relative to the corresponding shape if the latter was centered at the origin.
 
-One problem that we should mention and which we only noticed towards the end is that, for some reason, the scenes are not rendered correctly on Ubuntu machines. As we were all developing on Windows, we only noticed that too late and had no time to figure out the issue, which might possibly be due to differences in graphics drivers which lead to some detail in the implementation being incompatible with Linux systems.
+Note: Scenes are rendered incorrectly on Ubuntu machines, which is probably due to driver issues. This issue will be investigated. 
 
 
 ### Combinations
@@ -74,7 +74,7 @@ One problem that we should mention and which we only noticed towards the end is 
 
 <br/><br/>
 
-We added the ability of adding smooth intersections, unions, or subtractions of any two primitives in JSON format directly as shown in the following example:
+We added the ability to add smooth intersections, unions, or subtractions of any two primitives in JSON format directly as shown in the following example:
 
 ```json
 unions: [
@@ -89,7 +89,7 @@ unions: [
 ]
 ```
 
-This was very challenging since it meant that the way we were going through the primitives in the exercise session wouldn't do the trick since we cannot iterate through the shapes one primitive at a time and in any order. Our new solution involved creating a ShapesCombination struct in the shader which has information that allows us to locate each one of the two shapes:
+A ShapesCombination struct is used in the shader. It has information that allows us to locate each one of the two shapes:
 
 ```c
 struct ShapesCombination {
@@ -118,7 +118,6 @@ vec4 get_sphere(int sphere_index){
 ```
 
 While this implementation is nice in the sense that it works and allows us to set directly in the JSON format any two primitives to be combined, it has a major drawback, which is that rendering combinations is extremely slow. This is most probably due to the heavy cost of branching.
-This was disappointing since this implementation alone can handle both basic primitives and combinations and yields very clean code. But due to its slowness, we opted to keep the original implementation for the primitves, and add this one to be used for combinations only since it's the only way to achieve what we wanted. 
 
 In conclusion, this implementation allowed us to specify combinations dynamically in the JSON, but had the drawback that we had to add a lot of code on top of what we had, making it quite hefty, and is very slow.
 
@@ -126,8 +125,7 @@ In conclusion, this implementation allowed us to specify combinations dynamicall
 ### Lighting
 ![Shading scene from the exercise sessions rendered in our engine](Report/images/Shading.png)
 
-We implemented basic phong lighting and reflections in the same way we did in the ray tracing exercises, so we will only elaborate on the following sections which describe novel aspects in lighting and shading.
-
+We implemented basic phong lighting and reflections. We elaborate on some aspects below:
 
 ### Soft Shadows
 
@@ -142,7 +140,6 @@ Soft shadows with penumbra were implemented to add better looking and more reali
 The implementation was done with the help of the following reference: [Inigo Quilez - Soft Shadows](https://www.iquilezles.org/www/articles/rmshadows/rmshadows.htm).
 
 It is a very straightforward implementation which we can benefit from since we're doing ray marching. Essentially, when computing sharp shadows, we check if the ray from a surface to the light source intersects with an object, and if it does then there's a shadow. For soft shadows, we use the fact that we are calculating distances to check how far the ray is from the object in case there's no intersection. Consequently, when the distance is very small, we want to put the point on the surface under penumbra, i.e. the smaller the distance from the surface, the darker the point should be. So with this slight modification to the code that allows us to modify the darkness of each point in this soft manner and to control it by a variable factor, we can very easily achieve nice effects such as the one seen in the image above. 
-
 
 
 ### Ambient Occlusion
@@ -177,39 +174,9 @@ Environment Mapping was implemented using cubemaps which were passed to the shad
 
 Environment Mapping can be enabled from in the JSON, and any cubemap can be specified. 3 examples are provided with the source code.
 
-
-### Camera Movement
-
-We worked on moving the camera in real-time to look around the scene, but we struggled to render the scenes at a high enough framrate to make it smooth to use. Therefore, to produce some nice visuals for the video, we finally only added a simple rotation to the camera such that it orbits around the target and recorded the frames at a very slow framerate using the provided technique to record WebGL, and consequently fixed the framerate to 60 fps to get smooth videos to show.
-
-### Noise
-
-<video align="left" controls width="475"> <source src="Report/images/3d_perlin_noise_60fps.webm" type="video/webm"></video>
-<video align="right" controls width="475"> <source src="Report/images/fbm_noise_60fps.webm" type="video/webm"></video>
-
-<br/><br/>
-
-Finally, with the help of some examples, we explored ray marching 3D noise functions and how they are used to achieve good looking visuals of all kind. 
-
-We started by raymarching 3D Perlin noise with and without FBM to achieve very soothing effects to look at. The results are shown above, whereas we are essentially sampling the noise and playing around with the colors, varying them with position, depth and time. We were inspired by the following reference: [Exploring 3D Perlin Noise](https://www.youtube.com/watch?v=vPy7WOHs2qs)
-
-
-<p align="center">
-    <video controls width="500"> <source src="Report/images/waves_60fps.webm" type="video/webm"></video>
-</p>
-
-
-Next, we explored producing waves by raymarching 3D noise, inspired by following: [Buoy](https://www.shadertoy.com/view/XdsGDB). We essentially significantly refactored and simplified the code and made it fit our implementation. We also used noise functions instead of sampling noise textures, and modified the results to our liking. The results are shown above.
-
-<p align="center">
-    <video controls width="500"> <source src="Report/images/clouds_60fps.webm" type="video/webm"></video>
-</p>
-
-Finally, we attempted to produce clouds, inspired by the waves shader and a multitude of shaders which achieved all kinds of effects with the same principles, including this clouds shaders: [Clouds](https://www.shadertoy.com/view/lssGRX). We also modified it to use noise functions rather than textures, significantly simplified the code and tweaked the aesthetics and colors to our liking.
-
 ## Results
 
-All the scenes and features mentioned above can be tested and rendered by running the WebGL source code which we have included with our deliverables and which has all the scenes pre-defined.
+All the scenes and features mentioned above can be tested and rendered by running the WebGL source code.
 
 Further, the video below summarizes and shows off all the features described in this report, the results of which have mostly been shown in figures above.
 
